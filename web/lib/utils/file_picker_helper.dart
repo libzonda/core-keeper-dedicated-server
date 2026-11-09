@@ -52,3 +52,43 @@ void downloadFile(String url, String filename) {
   anchor.click();
   html.document.body?.children.remove(anchor);
 }
+
+void downloadTextFile(String content, String filename) {
+  final blob = html.Blob([content], 'text/plain;charset=utf-8');
+  final url = html.Url.createObjectUrlFromBlob(blob);
+  final anchor = html.AnchorElement(href: url)
+    ..setAttribute('download', filename)
+    ..style.display = 'none';
+  html.document.body?.children.add(anchor);
+  anchor.click();
+  html.document.body?.children.remove(anchor);
+  html.Url.revokeObjectUrl(url);
+}
+
+Future<bool> copyTextToClipboard(String text) async {
+  // 1. Try modern navigator.clipboard API if available
+  try {
+    if (html.window.navigator.clipboard != null) {
+      await html.window.navigator.clipboard!.writeText(text);
+      return true;
+    }
+  } catch (_) {}
+
+  // 2. Fallback using textarea + execCommand('copy') which works universally on HTTP and HTTPS
+  try {
+    final textarea = html.TextAreaElement()
+      ..value = text
+      ..style.position = 'fixed'
+      ..style.left = '-9999px'
+      ..style.top = '-9999px'
+      ..style.opacity = '0';
+    html.document.body?.append(textarea);
+    textarea.focus();
+    textarea.select();
+    final success = html.document.execCommand('copy');
+    textarea.remove();
+    if (success) return true;
+  } catch (_) {}
+
+  return false;
+}

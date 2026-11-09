@@ -97,7 +97,9 @@ class AppLocalizations {
   String get pauseScroll => _t('pauseScroll');
   String get clearLogs => _t('clearLogs');
   String get copyLogs => _t('copyLogs');
+  String get exportLogs => _t('exportLogs');
   String get logsCopied => _t('logsCopied');
+  String get logsExported => _t('logsExported');
   String get logsCleared => _t('logsCleared');
 
   // Config
@@ -506,7 +508,9 @@ class AppLocalizations {
       'pauseScroll': '暂停滚动',
       'clearLogs': '清屏',
       'copyLogs': '复制',
+      'exportLogs': '导出',
       'logsCopied': '已复制当前日志到剪贴板',
+      'logsExported': '日志已导出下载',
       'logsCleared': '已清空当前控制台日志显示',
       'configTitle': '服务器配置与网络代理',
       'configSubtitle': '设置游戏房间参数、网络拓扑模式与 SteamCMD 下载代理',
@@ -812,7 +816,9 @@ class AppLocalizations {
       'pauseScroll': 'Pause Scroll',
       'clearLogs': 'Clear',
       'copyLogs': 'Copy',
+      'exportLogs': 'Export',
       'logsCopied': 'Logs copied to clipboard',
+      'logsExported': 'Logs exported for download',
       'logsCleared': 'Console log display cleared',
       'configTitle': 'Server Configuration & Proxy',
       'configSubtitle': 'Configure room settings, network topology, and SteamCMD proxies',
@@ -1118,7 +1124,9 @@ class AppLocalizations {
       'pauseScroll': 'Pausar Desplazamiento',
       'clearLogs': 'Limpiar',
       'copyLogs': 'Copiar',
+      'exportLogs': 'Exportar',
       'logsCopied': 'Registros copiados al portapapeles',
+      'logsExported': 'Registros exportados para descarga',
       'logsCleared': 'Pantalla de registros vaciada',
       'configTitle': 'Configuración del Servidor y Proxy',
       'configSubtitle': 'Configure parámetros de la sala, topología de red y proxies',
@@ -1416,7 +1424,9 @@ class AppLocalizations {
       'pauseScroll': 'Pause Défilement',
       'clearLogs': 'Effacer',
       'copyLogs': 'Copier',
+      'exportLogs': 'Exporter',
       'logsCopied': 'Journaux copiés',
+      'logsExported': 'Journaux exportés pour téléchargement',
       'logsCleared': 'Affichage de la console effacé',
       'configTitle': 'Configuration & Proxy',
       'configSubtitle': 'Paramètres de la partie, topologie réseau et proxy SteamCMD',
@@ -1722,7 +1732,9 @@ class AppLocalizations {
       'pauseScroll': '一時停止',
       'clearLogs': 'クリア',
       'copyLogs': 'コピー',
+      'exportLogs': 'エクスポート',
       'logsCopied': 'ログをクリップボードにコピーしました',
+      'logsExported': 'ログをダウンロード出力しました',
       'logsCleared': 'コンソール画面をクリアしました',
       'configTitle': 'サーバー設定とプロキシ',
       'configSubtitle': 'ゲーム設定、ネットワークモード、SteamCMDプロキシを設定',
@@ -2028,7 +2040,9 @@ class AppLocalizations {
       'pauseScroll': '스크롤 일시정지',
       'clearLogs': '지우기',
       'copyLogs': '복사',
+      'exportLogs': '내보내기',
       'logsCopied': '로그가 클립보드에 복사되었습니다',
+      'logsExported': '로그를 내보냈습니다',
       'logsCleared': '콘솔 로그 화면을 지웠습니다',
       'configTitle': '서버 구성 및 프록시 설정',
       'configSubtitle': '게임 파라미터, 네트워크 모드 및 SteamCMD 프록시 설정',
@@ -2334,7 +2348,9 @@ class AppLocalizations {
       'pauseScroll': 'Пауза',
       'clearLogs': 'Очистить',
       'copyLogs': 'Копировать',
+      'exportLogs': 'Экспорт',
       'logsCopied': 'Логи скопированы в буфер',
+      'logsExported': 'Логи экспортированы для скачивания',
       'logsCleared': 'Консоль очищена',
       'configTitle': 'Настройки сервера и прокси',
       'configSubtitle': 'Параметры комнаты, топология сети и прокси SteamCMD',

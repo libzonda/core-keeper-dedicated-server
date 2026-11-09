@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../services/api_service.dart';
 import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
+import '../utils/file_picker_helper.dart';
 import '../widgets/app_dialog.dart';
 import '../widgets/current_instance_badge.dart';
 import '../widgets/page_header.dart';
@@ -116,18 +117,45 @@ class _ConsoleViewState extends State<ConsoleView> {
     super.dispose();
   }
 
-  void _copyAllLogs() {
+  Future<void> _copyAllLogs() async {
     final l10n = context.l10n;
     final text = _logs.join('\n');
-    Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.logsCopied),
-        backgroundColor: SurfaceLevel.block.colorOf(context),
-        behavior: SnackBarBehavior.floating,
-        shape: AppShape.sm,
-      ),
-    );
+    if (text.isEmpty) return;
+    try {
+      await Clipboard.setData(ClipboardData(text: text));
+    } catch (_) {}
+    await copyTextToClipboard(text);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.logsCopied),
+          backgroundColor: SurfaceLevel.block.colorOf(context),
+          behavior: SnackBarBehavior.floating,
+          shape: AppShape.sm,
+        ),
+      );
+    }
+  }
+
+  void _exportLogs() {
+    final l10n = context.l10n;
+    final text = _logs.join('\n');
+    if (text.isEmpty) return;
+    final now = DateTime.now();
+    String pad(int n) => n.toString().padLeft(2, '0');
+    final timestamp = '${now.year}${pad(now.month)}${pad(now.day)}_${pad(now.hour)}${pad(now.minute)}${pad(now.second)}';
+    final filename = 'corekeeper_logs_$timestamp.txt';
+    downloadTextFile(text, filename);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.logsExported),
+          backgroundColor: SurfaceLevel.block.colorOf(context),
+          behavior: SnackBarBehavior.floating,
+          shape: AppShape.sm,
+        ),
+      );
+    }
   }
 
   Future<void> _clearLogs() async {
@@ -231,6 +259,15 @@ class _ConsoleViewState extends State<ConsoleView> {
           child: isMobile ? null : Text(l10n.copyLogs),
         );
 
+        final exportBtn = SquircleButton(
+          variant: ButtonVariant.secondary,
+          icon: const Icon(Icons.download_rounded, size: 15),
+          onPressed: _exportLogs,
+          tooltip: l10n.exportLogs,
+          padding: isMobile ? const EdgeInsets.all(10) : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: isMobile ? null : Text(l10n.exportLogs),
+        );
+
         final clearBtn = SquircleButton(
           variant: ButtonVariant.ghost,
           icon: const Icon(Icons.delete_outline_rounded, size: 15),
@@ -252,6 +289,8 @@ class _ConsoleViewState extends State<ConsoleView> {
                   const SizedBox(width: 8),
                   copyBtn,
                   const SizedBox(width: 8),
+                  exportBtn,
+                  const SizedBox(width: 8),
                   clearBtn,
                 ],
               )
@@ -267,6 +306,8 @@ class _ConsoleViewState extends State<ConsoleView> {
                       lockBtn,
                       const SizedBox(width: 6),
                       copyBtn,
+                      const SizedBox(width: 6),
+                      exportBtn,
                       const SizedBox(width: 6),
                       clearBtn,
                     ],
