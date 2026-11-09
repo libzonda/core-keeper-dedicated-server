@@ -1,0 +1,23 @@
+# Binaries & Builds
+server/corekeeper-manager
+web/build/
+web/.dart_tool/
+web/.flutter-plugins
+web/.flutter-plugins-dependencies
+
+# Runtime data & Game files
+server-data/
+server-game/
+*.log
+*.bak*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+**/.idea/
+.vscode/
+**/.vscode/
+*.iml
+
+

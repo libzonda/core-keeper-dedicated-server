@@ -1,0 +1,22 @@
+services:
+  core-keeper-server:
+    image: corekeeper-dedicated-server:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: core-keeper-server
+    restart: unless-stopped
+    ports:
+      # Web 管理后台端口 (Web Dashboard)
+      - "8080:8080"
+      # 直链模式批量预留 UDP 端口段 (供多实例并发直链使用，如 27015, 27025, 27035...)
+      # Steam SDR 模式通过官方中继连接，免端口映射；若仅用 SDR 可注释此段
+      - "27015-27065:27015-27065/udp"
+    environment:
+      # Web 控制台服务端口 (可选，默认 8080)
+      - WEB_PORT=8080
+    volumes:
+      # 持久化存储所有实例列表、独立存档、配置文件与共享模组
+      - ./server-data:/server/data
+      # 游戏服务端二进制文件 (SteamCMD 自动下载维护)
+      - ./server-game:/server/game

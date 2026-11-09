@@ -1,0 +1,64 @@
+# syntax=docker/dockerfile:1
+FROM ubuntu:22.04
+
+LABEL maintainer="Core Keeper Dedicated Server Community"
+LABEL description="Official Core Keeper Dedicated Server pure headless container (SDR & Direct Connect)."
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV GAME_PATH=/server/game
+ENV DATA_PATH=/server/data
+ENV NETWORK_MODE=sdr
+ENV WORLD_INDEX=0
+ENV WORLD_NAME="libzonda's Dedicated Server"
+ENV WORLD_SEED=0
+ENV WORLD_MODE=0
+ENV MAX_PLAYERS=10
+ENV PORT=27015
+ENV BIND_IP=0.0.0.0
+ENV SERVER_PASSWORD=""
+ENV GAME_ID=""
+
+RUN dpkg --add-architecture i386 && \
+    apt-get update && \
+    echo steam steam/question select "I AGREE" | debconf-set-selections && \
+    echo steam steam/license note '' | debconf-set-selections && \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        xvfb \
+        libxi6 \
+        libglu1-mesa \
+        libpulse0 \
+        libasound2 \
+        lib32gcc-s1 \
+        steamcmd && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    ln -sf /usr/games/steamcmd /usr/bin/steamcmd && \
+    useradd -m -s /bin/bash steam && \
+    mkdir -p /server/game /server/data && \
+    chown -R steam:steam /server /home/steam
+
+USER steam
+WORKDIR /server
+
+EXPOSE 27015/udp 27016/udp
+
+CMD ["/bin/bash", "-c", "\
+    echo '[Server] Updating Core Keeper Dedicated Server (1963720)...' && \
+    steamcmd +force_install_dir \"$GAME_PATH\" +login anonymous +app_update 1963720 validate +quit && \
+    mkdir -p \"$HOME/.steam/sdk64\" && \
+    echo '1621690' > \"$GAME_PATH/steam_appid.txt\" && \
+    [ -f \"$GAME_PATH/linux64/steamclient.so\" ] && ln -sf \"$GAME_PATH/linux64/steamclient.so\" \"$HOME/.steam/sdk64/steamclient.so\" || true && \
+    ARGS=('-batchmode' '-datapath' \"$DATA_PATH\" '-world' \"$WORLD_INDEX\" '-worldname' \"$WORLD_NAME\" '-worldseed' \"$WORLD_SEED\" '-worldmode' \"$WORLD_MODE\" '-maxplayers' \"$MAX_PLAYERS\") && \
+    if [ \"$NETWORK_MODE\" = 'direct' ]; then \
+        ARGS+=('-ip' \"$BIND_IP\" '-port' \"$PORT\"); \
+        [ -n \"$SERVER_PASSWORD\" ] && ARGS+=('-password' \"$SERVER_PASSWORD\"); \
+    else \
+        [ -n \"$GAME_ID\" ] && ARGS+=('-gameid' \"$GAME_ID\"); \
+    fi && \
+    export LD_LIBRARY_PATH=\"$GAME_PATH:$GAME_PATH/linux64:$LD_LIBRARY_PATH\" && \
+    echo \"[Server] Launching Core Keeper Dedicated Server in $NETWORK_MODE mode...\" && \
+    xvfb-run -a -s \"-screen 0 640x480x16\" \"$GAME_PATH/CoreKeeperServer\" \"${ARGS[@]}\" \
+"]
+

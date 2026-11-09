@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Core Keeper Dedicated Server Manager">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="core_keeper_web">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="shortcut icon" href="favicon.ico"/>
+
+  <title>Core Keeper Server Manager</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      background-color: #0F0F12;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    {{flutter_js}}
+    {{flutter_build_config}}
+
+    if (!window._flutter) {
+      window._flutter = {};
+    }
+    if (!window._flutter.buildConfig) {
+      window._flutter.buildConfig = {};
+    }
+    window._flutter.buildConfig.useLocalCanvasKit = true;
+
+    _flutter.loader.load({
+      config: {
+        canvasKitBaseUrl: "canvaskit/",
+        fontFallbackBaseUrl: "fonts/s/",
+      },
+      serviceWorkerSettings: {
+        serviceWorkerVersion: {{flutter_service_worker_version}}
+      }
+    });
+  </script>
+</body>
+</html>

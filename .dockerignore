@@ -1,0 +1,11 @@
+.git
+.github
+server-data/
+server-game/
+web/.dart_tool
+web/.flutter-plugins
+web/.flutter-plugins-dependencies
+web/build
+server/corekeeper-manager
+*.log
+
