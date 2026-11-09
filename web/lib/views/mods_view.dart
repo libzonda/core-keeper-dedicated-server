@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../models/mod_item.dart';
 import '../services/api_service.dart';
@@ -306,7 +307,7 @@ class _ModsViewState extends State<ModsView> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withOpacity(0.08),
+                        color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
@@ -441,7 +442,9 @@ class _ModsViewState extends State<ModsView> {
                                 setState(() {});
                                 _showToast(l10n.modioSaveSuccess);
                               }
-                              Navigator.of(dialogCtx).pop();
+                              if (dialogCtx.mounted) {
+                                Navigator.of(dialogCtx).pop();
+                              }
                             } catch (e) {
                               setDialogState(() {
                                 testSuccess = false;
@@ -462,6 +465,19 @@ class _ModsViewState extends State<ModsView> {
         },
       ),
     );
+  }
+
+  Future<void> _openModUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri != null) {
+      try {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } catch (e) {
+        if (mounted) {
+          _showToast('Failed to open link: $e', isError: true);
+        }
+      }
+    }
   }
 
   void _showToast(String msg, {bool isError = false}) {
@@ -754,6 +770,16 @@ class _ModsViewState extends State<ModsView> {
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        if (mod.hasWebPage) ...[
+                          IconButton(
+                            icon: const Icon(Icons.open_in_new_rounded, size: 18),
+                            tooltip: l10n.viewModPage,
+                            visualDensity: VisualDensity.compact,
+                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                            onPressed: () => _openModUrl(mod.sourceUrl),
+                          ),
+                          const SizedBox(width: 4),
+                        ],
                         if (mod.canUpdate) ...[
                           SquircleButton(
                             variant: ButtonVariant.secondary,

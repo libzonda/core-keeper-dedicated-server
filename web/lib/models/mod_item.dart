@@ -29,6 +29,9 @@ class ModItem {
     this.canUpdate = false,
   });
 
+  bool get hasWebPage =>
+      sourceUrl.startsWith('http://') || sourceUrl.startsWith('https://');
+
   String get formattedSize {
     if (sizeBytes <= 0) return '0 KB';
     if (sizeBytes < 1024 * 1024) {

@@ -222,6 +222,7 @@ class AppLocalizations {
   String get modAuthor => _t('modAuthor');
   String get modVersion => _t('modVersion');
   String get updateMod => _t('updateMod');
+  String get viewModPage => _t('viewModPage');
   String get updatingMod => _t('updatingMod');
   String get modUpdateSuccess => _t('modUpdateSuccess');
   String get modSource => _t('modSource');
@@ -608,6 +609,7 @@ class AppLocalizations {
       'modAuthor': '作者',
       'modVersion': '版本',
       'updateMod': '更新',
+      'viewModPage': '访问模组主页',
       'updatingMod': '正在更新...',
       'modUpdateSuccess': '模组更新成功',
       'modSource': '来源',
@@ -905,6 +907,7 @@ class AppLocalizations {
       'modAuthor': 'Author',
       'modVersion': 'Version',
       'updateMod': 'Update',
+      'viewModPage': 'Open Mod Page',
       'updatingMod': 'Updating...',
       'modUpdateSuccess': 'Mod updated successfully',
       'modSource': 'Source',
@@ -1202,6 +1205,7 @@ class AppLocalizations {
       'modAuthor': 'Autor',
       'modVersion': 'Versión',
       'updateMod': 'Actualizar',
+      'viewModPage': 'Abrir página del mod',
       'updatingMod': 'Actualizando...',
       'modUpdateSuccess': 'Mod actualizado con éxito',
       'modSource': 'Origen',
@@ -1491,6 +1495,7 @@ class AppLocalizations {
       'modAuthor': 'Auteur',
       'modVersion': 'Version',
       'updateMod': 'Mettre à jour',
+      'viewModPage': 'Ouvrir la page du mod',
       'updatingMod': 'Mise à jour...',
       'modUpdateSuccess': 'Mod mis à jour avec succès',
       'modSource': 'Source',
@@ -1788,6 +1793,7 @@ class AppLocalizations {
       'modAuthor': '作者',
       'modVersion': 'バージョン',
       'updateMod': '更新',
+      'viewModPage': 'MODページを開く',
       'updatingMod': '更新中...',
       'modUpdateSuccess': 'MODが正常に更新されました',
       'modSource': 'ソース',
@@ -2085,6 +2091,7 @@ class AppLocalizations {
       'modAuthor': '제작자',
       'modVersion': '버전',
       'updateMod': '업데이트',
+      'viewModPage': '모드 페이지 열기',
       'updatingMod': '업데이트 중...',
       'modUpdateSuccess': '모드가 성공적으로 업데이트되었습니다',
       'modSource': '출처',
@@ -2382,6 +2389,7 @@ class AppLocalizations {
       'modAuthor': 'Автор',
       'modVersion': 'Версия',
       'updateMod': 'Обновить',
+      'viewModPage': 'Открыть страницу мода',
       'updatingMod': 'Обновление...',
       'modUpdateSuccess': 'Мод успешно обновлен',
       'modSource': 'Источник',

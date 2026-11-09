@@ -317,6 +317,10 @@ func (mm *ModManager) ListModsWithEnabled(enabledList []string) ([]ModInfo, erro
 			}
 		}
 
+		if isWorkshop && workshopID != "" && sourceURL == "" {
+			sourceURL = fmt.Sprintf("https://steamcommunity.com/sharedfiles/filedetails/?id=%s", workshopID)
+		}
+
 		mods = append(mods, ModInfo{
 			ID:          cleanID,
 			Name:        displayName,
