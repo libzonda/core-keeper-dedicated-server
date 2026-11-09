@@ -259,7 +259,16 @@ func (pm *ProcessManager) Stop() error {
 
 func (pm *ProcessManager) Restart() error {
 	_ = pm.Stop()
-	time.Sleep(1 * time.Second)
+	for i := 0; i < 50; i++ {
+		pm.mu.RLock()
+		st := pm.status
+		pm.mu.RUnlock()
+		if st == StatusStopped {
+			break
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	time.Sleep(200 * time.Millisecond)
 	return pm.Start()
 }
 
@@ -373,6 +382,16 @@ var (
 )
 
 func (pm *ProcessManager) runServer() {
+	defer func() {
+		pm.mu.Lock()
+		if pm.status == StatusStarting {
+			pm.status = StatusStopped
+			pm.cmd = nil
+			pm.updateCmd = nil
+		}
+		pm.mu.Unlock()
+	}()
+
 	cfg := pm.configMgr.Get()
 
 	// Locate executable
@@ -408,7 +427,6 @@ func (pm *ProcessManager) runServer() {
 		}
 
 		if acquired {
-			defer globalSteamUpdateMu.Unlock()
 			hasBinary = fileExists(masterExecPath)
 			if !hasBinary || time.Since(lastSteamUpdateTime) > 10*time.Minute {
 				timeout := 20 * time.Minute
@@ -433,16 +451,23 @@ func (pm *ProcessManager) runServer() {
 
 				if err != nil {
 					if errors.Is(ctx.Err(), context.Canceled) {
+						globalSteamUpdateMu.Unlock()
 						return
 					}
 					if hasBinary {
 						pm.BroadcastLog(fmt.Sprintf("[Manager] Warning: Pre-flight SteamCMD check failed or timed out (%v), but existing server binary is available. Proceeding to launch...", err))
+					} else {
+						pm.BroadcastLog(fmt.Sprintf("[Manager] Failed to download server files via SteamCMD: %v", err))
+						pm.BroadcastLog("[Manager] Please check your network connection/proxy settings, or download game files manually.")
+						globalSteamUpdateMu.Unlock()
+						return
 					}
 				} else {
 					lastSteamUpdateTime = time.Now()
 					time.Sleep(2 * time.Second)
 				}
 			}
+			globalSteamUpdateMu.Unlock()
 		} else {
 			if hasBinary {
 				pm.BroadcastLog("[Manager] SteamCMD check is currently busy with another operation. Proceeding to launch existing server binary...")

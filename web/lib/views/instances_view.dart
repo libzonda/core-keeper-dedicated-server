@@ -532,7 +532,7 @@ class _InstancesViewState extends State<InstancesView> {
                                     onPressed: isBusy ? null : () => _startInstance(inst),
                                     child: Text(l10n.startServer),
                                   )
-                                else if (inst.isRunning) ...[
+                                else ...[
                                   SquircleButton(
                                     variant: ButtonVariant.secondary,
                                     height: 32,

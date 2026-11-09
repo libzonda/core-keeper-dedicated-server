@@ -385,7 +385,28 @@ class _DashboardViewState extends State<DashboardView> {
               spacing: 12,
               runSpacing: 12,
               children: [
-                if (s?.isStarting == true || (_actionLoading && !isRunning))
+                if (s?.isStarting == true) ...[
+                  SquircleButton(
+                    variant: ButtonVariant.secondary,
+                    isLoading: true,
+                    onPressed: null,
+                    child: Text(l10n.startingServer),
+                  ),
+                  SquircleButton(
+                    variant: ButtonVariant.destructive,
+                    icon: const Icon(Icons.stop_rounded),
+                    isLoading: _actionLoading,
+                    onPressed: _handleStop,
+                    child: Text(l10n.stopServer),
+                  ),
+                  SquircleButton(
+                    variant: ButtonVariant.secondary,
+                    icon: const Icon(Icons.refresh_rounded),
+                    isLoading: _actionLoading,
+                    onPressed: _handleRestart,
+                    child: Text(l10n.restartServer),
+                  ),
+                ] else if (_actionLoading && !isRunning)
                   SquircleButton(
                     variant: ButtonVariant.secondary,
                     isLoading: true,
