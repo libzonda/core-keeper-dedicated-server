@@ -29,6 +29,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ThemeController.instance.init();
   await LocaleController.instance.init();
+  unawaited(ApiService.instance.fetchVersion());
   runApp(const CoreKeeperManagerApp());
 }
 

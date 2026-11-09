@@ -9,6 +9,7 @@ import '../models/admin_item.dart';
 import '../models/world_item.dart';
 import '../models/mod_item.dart';
 import '../models/instance_item.dart';
+import '../utils/app_version.dart';
 
 class ApiService {
   static final ApiService instance = ApiService._internal();
@@ -175,9 +176,27 @@ class ApiService {
   Future<ServerStatus> getStatus() async {
     final res = await http.get(_buildUri('/api/status'));
     if (res.statusCode == 200) {
-      return ServerStatus.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));
+      final st = ServerStatus.fromJson(jsonDecode(utf8.decode(res.bodyBytes)));
+      if (st.version.isNotEmpty) {
+        AppVersion.update(st.version);
+      }
+      return st;
     }
     throw Exception('Failed to load status: ${res.statusCode}');
+  }
+
+  Future<String> fetchVersion() async {
+    try {
+      final res = await http.get(Uri.parse('$baseUrl/api/version'));
+      if (res.statusCode == 200) {
+        final decoded = jsonDecode(utf8.decode(res.bodyBytes));
+        if (decoded is Map && decoded['version'] is String) {
+          AppVersion.update(decoded['version']);
+          return decoded['version'];
+        }
+      }
+    } catch (_) {}
+    return AppVersion.current;
   }
 
   Future<void> startServer() async {

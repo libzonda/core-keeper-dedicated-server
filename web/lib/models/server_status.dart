@@ -12,6 +12,7 @@ class ServerStatus {
   final String instanceName;
   final String worldName;
   final bool restartRequired;
+  final String version;
 
   ServerStatus({
     required this.status,
@@ -27,6 +28,7 @@ class ServerStatus {
     this.instanceName = '',
     this.worldName = '',
     this.restartRequired = false,
+    this.version = '',
   });
 
   bool get isRunning => status == 'running';
@@ -63,6 +65,7 @@ class ServerStatus {
       instanceName: json['instanceName'] ?? '',
       worldName: json['worldName'] ?? '',
       restartRequired: json['restartRequired'] == true,
+      version: json['version'] ?? '',
     );
   }
 }

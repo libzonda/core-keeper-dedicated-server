@@ -8,6 +8,7 @@ import '../theme/app_motion.dart';
 import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
 import '../theme/theme_controller.dart';
+import '../utils/app_version.dart';
 import 'github_icon.dart';
 import 'icon_well.dart';
 import 'instance_dropdown.dart';
@@ -153,14 +154,38 @@ class NavigationSidebar extends StatelessWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.clip,
                               ),
-                              Text(
-                                'Server Manager',
-                                style: AppTextStyle.caption2.of(
-                                  context,
-                                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.clip,
+                              Row(
+                                children: [
+                                  Text(
+                                    'Server Manager',
+                                    style: AppTextStyle.caption2.of(
+                                      context,
+                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.clip,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  ValueListenableBuilder<String>(
+                                    valueListenable: AppVersion.notifier,
+                                    builder: (_, ver, __) => Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0.5),
+                                      decoration: BoxDecoration(
+                                        color: primaryColor.withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        ver,
+                                        style: TextStyle(
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.w600,
+                                          color: primaryColor,
+                                          letterSpacing: 0.2,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

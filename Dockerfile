@@ -1,26 +1,30 @@
 # syntax=docker/dockerfile:1
 
+ARG APP_VERSION=v0.1.1
+
 # -------------------------------------------------------------
 # Stage 1: Build Flutter Web Frontend
 # -------------------------------------------------------------
 FROM ghcr.io/cirruslabs/flutter:stable AS web-builder
+ARG APP_VERSION
 WORKDIR /app/web
 COPY web/pubspec.yaml ./
 RUN flutter pub get
 COPY web/ ./
-RUN flutter build web --release --no-wasm-dry-run && \
+RUN flutter build web --release --no-wasm-dry-run --dart-define=APP_VERSION=${APP_VERSION} && \
     sed -i '/sourceMappingURL=.*\.map/d' build/web/*.js 2>/dev/null || true
 
 # -------------------------------------------------------------
 # Stage 2: Build Go Server Manager Daemon
 # -------------------------------------------------------------
 FROM golang:alpine AS go-builder
+ARG APP_VERSION
 WORKDIR /app/server
 RUN apk add --no-cache git
 COPY server/go.mod server/go.sum* ./
 RUN go mod download
 COPY server/ ./
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o corekeeper-manager .
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w -X main.Version=${APP_VERSION}" -o corekeeper-manager .
 
 # -------------------------------------------------------------
 # Stage 3: Production Runtime
@@ -83,6 +87,9 @@ RUN ln -sf /usr/games/steamcmd /usr/bin/steamcmd
 RUN useradd -m -s /bin/bash steam && \
     mkdir -p /server/game /server/data /server/web && \
     chown -R steam:steam /server /home/steam
+
+# Pre-bootstrap steamcmd so first launch does not download client files
+RUN su - steam -c "steamcmd +quit" || true
 
 # Copy compiled Flutter Web artifacts
 COPY --from=web-builder /app/web/build/web /server/web

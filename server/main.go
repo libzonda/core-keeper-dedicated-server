@@ -20,6 +20,9 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// Version is injected during compilation via -ldflags="-X main.Version=vX.Y.Z"
+var Version = "v0.1.1"
+
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true // Allow all origins for web management
@@ -208,6 +211,14 @@ func main() {
 		}
 	})
 
+	// Application Version endpoint
+	mux.HandleFunc("/api/version", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_ = json.NewEncoder(w).Encode(map[string]string{
+			"version": Version,
+		})
+	})
+
 	// Server Control & Status (Instance-Aware)
 	mux.HandleFunc("/api/status", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
@@ -226,6 +237,7 @@ func main() {
 				Status:       StatusStopped,
 				ServerName:   "暂无实例",
 				InstanceName: "暂无实例",
+				Version:      Version,
 			})
 			return
 		}
@@ -235,6 +247,7 @@ func main() {
 				Status:       StatusStopped,
 				ServerName:   "暂无实例",
 				InstanceName: "暂无实例",
+				Version:      Version,
 			})
 			return
 		}

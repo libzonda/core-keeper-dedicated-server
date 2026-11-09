@@ -9,6 +9,7 @@ import '../widgets/icon_well.dart';
 import '../widgets/page_header.dart';
 import '../widgets/squircle_button.dart';
 import '../widgets/status_badge.dart';
+import '../utils/app_version.dart';
 
 class AboutView extends StatelessWidget {
   const AboutView({super.key});
@@ -100,9 +101,12 @@ class AboutView extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const StatusBadge(
-                            label: 'v1.0.0',
-                            type: BadgeType.success,
+                          ValueListenableBuilder<String>(
+                            valueListenable: AppVersion.notifier,
+                            builder: (_, ver, __) => StatusBadge(
+                              label: ver,
+                              type: BadgeType.success,
+                            ),
                           ),
                           const SizedBox(width: 8),
                           const StatusBadge(

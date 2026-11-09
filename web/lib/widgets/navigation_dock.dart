@@ -5,6 +5,7 @@ import '../theme/app_motion.dart';
 import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
 import '../theme/theme_controller.dart';
+import '../utils/app_version.dart';
 
 class DockDestination {
   final IconData icon;
@@ -87,9 +88,32 @@ class NavigationDock extends StatelessWidget {
                       Icon(Icons.apps_rounded, size: 22, color: primaryColor),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: Text(
-                          l10n.allFeatures,
-                          style: AppTextStyle.headline.of(context, emphasized: true),
+                        child: Row(
+                          children: [
+                            Text(
+                              l10n.allFeatures,
+                              style: AppTextStyle.headline.of(context, emphasized: true),
+                            ),
+                            const SizedBox(width: 8),
+                            ValueListenableBuilder<String>(
+                              valueListenable: AppVersion.notifier,
+                              builder: (_, ver, __) => Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: primaryColor.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  ver,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: primaryColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       IconButton(

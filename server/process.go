@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -37,6 +39,7 @@ type StatusResponse struct {
 	InstanceName    string       `json:"instanceName"`
 	WorldName       string       `json:"worldName"`
 	RestartRequired bool         `json:"restartRequired"`
+	Version         string       `json:"version"`
 }
 
 type ProcessManager struct {
@@ -45,6 +48,9 @@ type ProcessManager struct {
 	status    ServerStatus
 	startTime time.Time
 	mu        sync.RWMutex
+
+	updateCmd    *exec.Cmd
+	cancelUpdate context.CancelFunc
 
 	logRing     []string
 	maxLogLines int
@@ -166,6 +172,7 @@ func (pm *ProcessManager) GetStatus() StatusResponse {
 		MaxPlayers:      cfg.MaxPlayers,
 		ServerName:      cfg.WorldName,
 		RestartRequired: pm.restartRequired && (pm.status == StatusRunning || pm.status == StatusStarting),
+		Version:         Version,
 	}
 }
 
@@ -192,13 +199,24 @@ func (pm *ProcessManager) Start() error {
 
 func (pm *ProcessManager) Stop() error {
 	pm.mu.Lock()
-	if pm.status != StatusRunning && pm.status != StatusStarting {
+	if pm.status != StatusRunning && pm.status != StatusStarting && pm.status != StatusUpdating {
 		pm.mu.Unlock()
 		return fmt.Errorf("server is not running")
 	}
 	pm.status = StatusStopping
 	cmd := pm.cmd
+	updateCmd := pm.updateCmd
+	cancelUpdate := pm.cancelUpdate
 	pm.mu.Unlock()
+
+	// If SteamCMD is running, cancel and kill it immediately
+	if cancelUpdate != nil {
+		cancelUpdate()
+	}
+	if updateCmd != nil && updateCmd.Process != nil {
+		pm.BroadcastLog("[Manager] Aborting active SteamCMD update operation...")
+		_ = updateCmd.Process.Kill()
+	}
 
 	pm.BroadcastLog("[Manager] Initiating graceful server shutdown (SIGINT)...")
 
@@ -232,6 +250,8 @@ func (pm *ProcessManager) Stop() error {
 	pm.mu.Lock()
 	pm.status = StatusStopped
 	pm.cmd = nil
+	pm.updateCmd = nil
+	pm.cancelUpdate = nil
 	pm.mu.Unlock()
 	pm.BroadcastLog("[Manager] Server stopped.")
 	return nil
@@ -260,17 +280,25 @@ func (pm *ProcessManager) UpdateServer(steamUser, steamPass string) error {
 		defer func() {
 			pm.mu.Lock()
 			pm.status = StatusStopped
+			pm.cancelUpdate = nil
+			pm.updateCmd = nil
 			pm.mu.Unlock()
 		}()
 
 		cfg := pm.configMgr.Get()
-		_ = pm.runSteamCmdUpdate(cfg, steamUser, steamPass)
+		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Minute)
+		pm.mu.Lock()
+		pm.cancelUpdate = cancel
+		pm.mu.Unlock()
+		defer cancel()
+
+		_ = pm.runSteamCmdUpdate(ctx, cfg, steamUser, steamPass)
 	}()
 
 	return nil
 }
 
-func (pm *ProcessManager) runSteamCmdUpdate(cfg ServerConfig, steamUser, steamPass string) error {
+func (pm *ProcessManager) runSteamCmdUpdate(ctx context.Context, cfg ServerConfig, steamUser, steamPass string) error {
 	pm.BroadcastLog("[SteamCMD] Connecting to SteamCMD to check Core Keeper Dedicated Server (AppID: 1963720)...")
 
 	steamcmdPath := findSteamCmd()
@@ -292,10 +320,22 @@ func (pm *ProcessManager) runSteamCmdUpdate(cfg ServerConfig, steamUser, steamPa
 	args = append(args, loginArgs...)
 	args = append(args, "+app_update", "1963720", "validate", "+quit")
 
-	cmd := exec.Command(steamcmdPath, args...)
+	cmd := exec.CommandContext(ctx, steamcmdPath, args...)
 	if proxyURL != "" {
 		ApplyProxyEnv(cmd, proxyURL)
 	}
+
+	pm.mu.Lock()
+	pm.updateCmd = cmd
+	pm.mu.Unlock()
+
+	defer func() {
+		pm.mu.Lock()
+		if pm.updateCmd == cmd {
+			pm.updateCmd = nil
+		}
+		pm.mu.Unlock()
+	}()
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -314,7 +354,13 @@ func (pm *ProcessManager) runSteamCmdUpdate(cfg ServerConfig, steamUser, steamPa
 
 	err = cmd.Wait()
 	if err != nil {
-		pm.BroadcastLog(fmt.Sprintf("[SteamCMD] Finished with status: %v", err))
+		if errors.Is(ctx.Err(), context.Canceled) {
+			pm.BroadcastLog("[SteamCMD] Update operation was canceled by user.")
+		} else if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			pm.BroadcastLog("[SteamCMD] Update operation timed out.")
+		} else {
+			pm.BroadcastLog(fmt.Sprintf("[SteamCMD] Finished with status: %v", err))
+		}
 	} else {
 		pm.BroadcastLog("[SteamCMD] Server files are verified and up to date!")
 	}
@@ -333,9 +379,10 @@ func (pm *ProcessManager) runServer() {
 	execName := "CoreKeeperServer"
 	masterExecPath := filepath.Join(cfg.ServerDir, execName)
 
-	// If AutoUpdate is enabled OR binary is missing, run SteamCMD check
-	needsUpdate := !fileExists(masterExecPath)
-	if !needsUpdate && cfg.AutoUpdate {
+	hasBinary := fileExists(masterExecPath)
+	needsUpdate := !hasBinary
+
+	if hasBinary && cfg.AutoUpdate {
 		globalSteamUpdateMu.Lock()
 		if time.Since(lastSteamUpdateTime) > 10*time.Minute {
 			needsUpdate = true
@@ -344,18 +391,80 @@ func (pm *ProcessManager) runServer() {
 	}
 
 	if needsUpdate {
-		globalSteamUpdateMu.Lock()
-		if !fileExists(masterExecPath) || time.Since(lastSteamUpdateTime) > 10*time.Minute {
-			pm.BroadcastLog("[Manager] Auto-update is enabled. Running pre-flight SteamCMD check & update...")
-			_ = pm.runSteamCmdUpdate(cfg, "", "")
-			lastSteamUpdateTime = time.Now()
-			time.Sleep(3 * time.Second)
+		// Non-blocking attempt to acquire the SteamCMD mutex
+		acquired := false
+		for i := 0; i < 50; i++ {
+			pm.mu.RLock()
+			st := pm.status
+			pm.mu.RUnlock()
+			if st != StatusStarting && st != StatusUpdating {
+				return // cancelled by user (e.g. Stop() called)
+			}
+			if globalSteamUpdateMu.TryLock() {
+				acquired = true
+				break
+			}
+			time.Sleep(100 * time.Millisecond)
 		}
-		globalSteamUpdateMu.Unlock()
+
+		if acquired {
+			defer globalSteamUpdateMu.Unlock()
+			hasBinary = fileExists(masterExecPath)
+			if !hasBinary || time.Since(lastSteamUpdateTime) > 10*time.Minute {
+				timeout := 20 * time.Minute
+				if !hasBinary {
+					pm.BroadcastLog("[Manager] Server binary not found. Initiating initial download via SteamCMD (AppID: 1963720)...")
+					pm.BroadcastLog("[Manager] Tip: Downloading game files (~600MB) may take several minutes depending on network bandwidth. If you are in China or behind a firewall, configure a proxy in Settings -> Network Proxy.")
+				} else {
+					pm.BroadcastLog("[Manager] Auto-update is enabled. Running pre-flight SteamCMD check & update...")
+					timeout = 90 * time.Second
+				}
+
+				ctx, cancel := context.WithTimeout(context.Background(), timeout)
+				pm.mu.Lock()
+				pm.cancelUpdate = cancel
+				pm.mu.Unlock()
+
+				err := pm.runSteamCmdUpdate(ctx, cfg, "", "")
+				cancel()
+				pm.mu.Lock()
+				pm.cancelUpdate = nil
+				pm.mu.Unlock()
+
+				if err != nil {
+					if errors.Is(ctx.Err(), context.Canceled) {
+						return
+					}
+					if hasBinary {
+						pm.BroadcastLog(fmt.Sprintf("[Manager] Warning: Pre-flight SteamCMD check failed or timed out (%v), but existing server binary is available. Proceeding to launch...", err))
+					}
+				} else {
+					lastSteamUpdateTime = time.Now()
+					time.Sleep(2 * time.Second)
+				}
+			}
+		} else {
+			if hasBinary {
+				pm.BroadcastLog("[Manager] SteamCMD check is currently busy with another operation. Proceeding to launch existing server binary...")
+			} else {
+				pm.BroadcastLog("[Manager] Waiting for background SteamCMD download to complete...")
+				globalSteamUpdateMu.Lock()
+				globalSteamUpdateMu.Unlock()
+			}
+		}
+	}
+
+	// Re-verify status in case user clicked Stop while downloading
+	pm.mu.RLock()
+	st := pm.status
+	pm.mu.RUnlock()
+	if st != StatusStarting {
+		return
 	}
 
 	if !fileExists(masterExecPath) {
 		pm.BroadcastLog(fmt.Sprintf("[Manager] Server binary not found at %s even after SteamCMD check.", masterExecPath))
+		pm.BroadcastLog("[Manager] Please check your network connection/proxy settings or trigger an update manually from the Overview page.")
 		pm.mu.Lock()
 		pm.status = StatusStopped
 		pm.mu.Unlock()
