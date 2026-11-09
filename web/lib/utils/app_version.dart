@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-const String defaultAppVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'v0.1.1');
+const String defaultAppVersion = String.fromEnvironment('APP_VERSION', defaultValue: 'v0.1.2');
 
 class AppVersion {
   static String format(String v) {
