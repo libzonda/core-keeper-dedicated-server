@@ -753,6 +753,45 @@ func (im *InstanceManager) UpdateInstance(id string, update ServerInstance) erro
 	return im.persistRegistryLocked()
 }
 
+func (im *InstanceManager) SetInstanceWorld(id string, worldIndex int, worldName string, worldMode int, worldSeed int64) error {
+	im.mu.Lock()
+	defer im.mu.Unlock()
+
+	runtime, ok := im.instances[id]
+	if !ok {
+		return fmt.Errorf("instance %s not found", id)
+	}
+
+	if runtime.Instance.WorldIndex != worldIndex {
+		// World slot changed: clean up old world's GameID so new world gets its own fresh GameID
+		cfg := runtime.ConfigMgr.Get()
+		cfg.GameID = ""
+		_ = os.Remove(filepath.Join(runtime.DataDir, "GameID.txt"))
+		runtime.ProcMgr.ResetGameID()
+	}
+
+	runtime.Instance.WorldIndex = worldIndex
+	if worldName != "" {
+		runtime.Instance.WorldName = worldName
+	}
+	runtime.Instance.WorldMode = worldMode
+	runtime.Instance.WorldSeed = worldSeed
+
+	cfg := runtime.ConfigMgr.Get()
+	cfg.WorldIndex = worldIndex
+	cfg.WorldName = runtime.Instance.WorldName
+	cfg.WorldMode = worldMode
+	cfg.WorldSeed = worldSeed
+	_ = runtime.ConfigMgr.Update(cfg)
+
+	st := runtime.ProcMgr.GetStatus()
+	if st.Status == StatusRunning || st.Status == StatusStarting {
+		runtime.ProcMgr.SetRestartRequired(true)
+	}
+
+	return im.persistRegistryLocked()
+}
+
 func (im *InstanceManager) DeleteInstance(id string) error {
 	im.mu.Lock()
 	defer im.mu.Unlock()

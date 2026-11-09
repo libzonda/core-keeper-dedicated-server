@@ -694,6 +694,39 @@ class _ModsViewState extends State<ModsView> {
 
           const SizedBox(height: 16),
 
+          // Notice banner: shared mods repo with independent instance state
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.2),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  size: 18,
+                  color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    l10n.sharedModsNotice,
+                    style: AppTextStyle.caption1.of(
+                      context,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
           // Installed Mods Card List
           if (_loading)
             const Center(child: Padding(padding: EdgeInsets.all(32), child: CircularProgressIndicator()))

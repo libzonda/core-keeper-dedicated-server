@@ -221,7 +221,12 @@ func (pm *ProcessManager) Stop() error {
 	pm.BroadcastLog("[Manager] Initiating graceful server shutdown (SIGINT)...")
 
 	if cmd != nil && cmd.Process != nil {
-		_ = cmd.Process.Signal(syscall.SIGINT)
+		pgid, err := syscall.Getpgid(cmd.Process.Pid)
+		if err == nil {
+			_ = syscall.Kill(-pgid, syscall.SIGINT)
+		} else {
+			_ = cmd.Process.Signal(syscall.SIGINT)
+		}
 
 		// Wait up to 10 seconds, then SIGKILL if still running
 		done := make(chan struct{})
@@ -243,7 +248,11 @@ func (pm *ProcessManager) Stop() error {
 		case <-done:
 		case <-time.After(10 * time.Second):
 			pm.BroadcastLog("[Manager] Force killing server process (SIGKILL)...")
-			_ = cmd.Process.Kill()
+			if err == nil {
+				_ = syscall.Kill(-pgid, syscall.SIGKILL)
+			} else {
+				_ = cmd.Process.Kill()
+			}
 		}
 	}
 
@@ -257,9 +266,15 @@ func (pm *ProcessManager) Stop() error {
 	return nil
 }
 
+func (pm *ProcessManager) ResetGameID() {
+	pm.mu.Lock()
+	pm.detectedGameID = ""
+	pm.mu.Unlock()
+}
+
 func (pm *ProcessManager) Restart() error {
 	_ = pm.Stop()
-	for i := 0; i < 50; i++ {
+	for i := 0; i < 60; i++ {
 		pm.mu.RLock()
 		st := pm.status
 		pm.mu.RUnlock()
@@ -268,7 +283,7 @@ func (pm *ProcessManager) Restart() error {
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 	return pm.Start()
 }
 
@@ -523,11 +538,27 @@ func (pm *ProcessManager) runServer() {
 		"-datapath", cfg.DataDir,
 		"-world", fmt.Sprintf("%d", cfg.WorldIndex),
 		"-worldname", cfg.WorldName,
-		"-worldseed", fmt.Sprintf("%d", cfg.WorldSeed),
-		"-worldmode", fmt.Sprintf("%d", cfg.WorldMode),
+	}
+
+	if cfg.WorldSeed != 0 {
+		args = append(args, "-worldseed", fmt.Sprintf("%d", cfg.WorldSeed))
+	}
+
+	modeStr := "Normal"
+	switch cfg.WorldMode {
+	case 1:
+		modeStr = "Hard"
+	case 2:
+		modeStr = "Creative"
+	case 4:
+		modeStr = "Casual"
+	}
+	args = append(args, "-worldmode", modeStr)
+
+	args = append(args,
 		"-maxplayers", fmt.Sprintf("%d", cfg.MaxPlayers),
 		"-logfile", "/dev/stdout",
-	}
+	)
 
 	// Clean up any stale runtime identification files in runDir before starting
 	if runDir != "" {
@@ -577,6 +608,7 @@ func (pm *ProcessManager) runServer() {
 	}
 
 	cmd.Dir = runDir
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	// Construct clean environment with correct HOME and LD_LIBRARY_PATH
 	home := os.Getenv("HOME")

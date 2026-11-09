@@ -801,22 +801,10 @@ func main() {
 			return
 		}
 
-		cfg := runtime.ConfigMgr.Get()
-		cfg.WorldIndex = meta.Index
-		cfg.WorldName = meta.Name
-		cfg.WorldMode = meta.Mode
-		cfg.WorldSeed = meta.Seed
-		if err := runtime.ConfigMgr.Update(cfg); err != nil {
+		if err := instanceMgr.SetInstanceWorld(runtime.Instance.ID, meta.Index, meta.Name, meta.Mode, meta.Seed); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		runtime.ProcMgr.SetRestartRequired(true)
-		_ = instanceMgr.UpdateInstance(runtime.Instance.ID, ServerInstance{
-			WorldIndex: meta.Index,
-			WorldName:  meta.Name,
-			WorldMode:  meta.Mode,
-			WorldSeed:  meta.Seed,
-		})
 		runtime.ProcMgr.BroadcastLog(fmt.Sprintf("[Manager] Switched active world to: %s", meta.Name))
 		writeJSON(w, map[string]interface{}{"activeWorld": req.Index, "message": "World switched successfully"})
 	})

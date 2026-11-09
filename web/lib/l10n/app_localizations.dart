@@ -249,6 +249,7 @@ class AppLocalizations {
   String get saveFailed => _t('saveFailed');
   String get modioClickToEdit => _t('modioClickToEdit');
   String get modioClickToConfigure => _t('modioClickToConfigure');
+  String get sharedModsNotice => _t('sharedModsNotice');
 
   String get instancesTitle => _t('instancesTitle');
   String get instancesSubtitle => _t('instancesSubtitle');
@@ -641,6 +642,7 @@ class AppLocalizations {
       'saveFailed': '保存失败',
       'modioClickToEdit': '点击修改 API Key',
       'modioClickToConfigure': '点击配置 API Key 以启用 Mod.io 下载',
+      'sharedModsNotice': '所有实例共享全局 Mod 文件库，但启用/禁用状态完全独立（新安装 Mod 仅为当前实例自动启用，其他实例保持初始禁用状态）。',
     },
     'en': {
     'create': 'Create',
@@ -944,6 +946,7 @@ class AppLocalizations {
       'saveFailed': 'Save failed',
       'modioClickToEdit': 'Click to modify API Key',
       'modioClickToConfigure': 'Click to configure API Key to enable Mod.io downloads',
+      'sharedModsNotice': 'All instances share the global mod repository, but enable/disable states are completely independent per instance (newly installed mods are auto-enabled for the current instance only, remaining disabled for others).',
     },
     'es': {
     'create': 'Crear',
@@ -1247,6 +1250,7 @@ class AppLocalizations {
       'saveFailed': 'Error al guardar',
       'modioClickToEdit': 'Haga clic para modificar la clave API',
       'modioClickToConfigure': 'Haga clic para configurar la clave API y habilitar las descargas de Mod.io',
+      'sharedModsNotice': 'Todas las instancias comparten el repositorio global de mods, pero los estados activado/desactivado son independientes por instancia (los nuevos mods se activan solo en la instancia actual, permaneciendo desactivados en las demás).',
     },
     'fr': {
     'create': 'Créer',
@@ -1542,6 +1546,7 @@ class AppLocalizations {
       'saveFailed': 'Échec de l’enregistrement',
       'modioClickToEdit': 'Cliquer pour modifier la clé API',
       'modioClickToConfigure': 'Cliquer pour configurer la clé API et activer les téléchargements Mod.io',
+      'sharedModsNotice': 'Toutes les instances partagent la bibliothèque globale de mods, mais les états activé/désactivé sont totalement indépendants par instance (les nouveaux mods ne sont activés que pour l’instance actuelle et restent désactivés sur les autres).',
     },
     'ja': {
     'create': '作成',
@@ -1845,6 +1850,7 @@ class AppLocalizations {
       'saveFailed': '保存に失敗しました',
       'modioClickToEdit': 'クリックしてAPIキーを変更',
       'modioClickToConfigure': 'クリックしてAPIキーを設定し、Mod.ioダウンロードを有効化',
+      'sharedModsNotice': 'すべてのインスタンスはグローバルMODリポジトリを共有しますが、有効/無効の状態は完全に独立しています（新規追加時は現在のインスタンスのみ自動有効化され、他のインスタンスは初期状態で無効のままです）。',
     },
     'ko': {
     'create': '생성',
@@ -2148,6 +2154,7 @@ class AppLocalizations {
       'saveFailed': '저장 실패',
       'modioClickToEdit': '클릭하여 API 키 수정',
       'modioClickToConfigure': '클릭하여 API 키를 설정하고 Mod.io 다운로드 활성화',
+      'sharedModsNotice': '모든 인스턴스는 전역 모드 저장소를 공유하지만 활성화/비활성화 상태는 인스턴스별로 완전히 독립적입니다 (새로 설치된 모드는 현재 인스턴스에만 자동 활성화되며 다른 인스턴스는 비활성화 상태를 유지합니다).',
     },
     'ru': {
     'create': 'Создать',
@@ -2451,6 +2458,7 @@ class AppLocalizations {
       'saveFailed': 'Ошибка сохранения',
       'modioClickToEdit': 'Нажмите, чтобы изменить API-ключ',
       'modioClickToConfigure': 'Нажмите, чтобы настроить API-ключ и включить загрузку с Mod.io',
+      'sharedModsNotice': 'Все инстансы используют общее хранилище файлов модов, но статус включения/отключения настраивается полностью независимо для каждого инстанса (новые моды автоматически включаются только для текущего инстанса, в остальных оставаясь выключенными).',
     },
   };
 }
