@@ -243,7 +243,7 @@ class _ModsViewState extends State<ModsView> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                '所有实例全局生效 (Global for all instances)',
+                                l10n.modioGlobalNotice,
                                 style: AppTextStyle.caption1.of(
                                   context,
                                   color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
@@ -401,7 +401,7 @@ class _ModsViewState extends State<ModsView> {
                             if (k.isEmpty) {
                               setDialogState(() {
                                 testSuccess = false;
-                                testMessage = '请先输入 API Key 再进行测试';
+                                testMessage = l10n.modioKeyEmptyWarning;
                               });
                               return;
                             }
@@ -418,7 +418,7 @@ class _ModsViewState extends State<ModsView> {
                             } catch (e) {
                               setDialogState(() {
                                 testSuccess = false;
-                                testMessage = '测试连接失败: $e';
+                                testMessage = '${l10n.modioTestFailed}: $e';
                               });
                             } finally {
                               setDialogState(() => testing = false);
@@ -448,7 +448,7 @@ class _ModsViewState extends State<ModsView> {
                             } catch (e) {
                               setDialogState(() {
                                 testSuccess = false;
-                                testMessage = '保存失败: $e';
+                                testMessage = '${l10n.saveFailed}: $e';
                                 saving = false;
                               });
                             }
@@ -570,7 +570,7 @@ class _ModsViewState extends State<ModsView> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              _modioConfigured ? '点击修改 API Key' : '点击配置 API Key 以启用 Mod.io 下载',
+                              _modioConfigured ? l10n.modioClickToEdit : l10n.modioClickToConfigure,
                               style: AppTextStyle.caption1.of(
                                 context,
                                 color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,

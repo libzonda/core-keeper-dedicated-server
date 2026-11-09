@@ -187,13 +187,16 @@ class AboutView extends StatelessWidget {
                 Divider(height: 1, thickness: 1, color: hairline, indent: 56),
 
                 // Version row
-                _InfoTile(
-                  icon: Icons.tag_rounded,
-                  title: l10n.aboutVersionTitle,
-                  value: 'Release 1.0.0 (Build 2026.11)',
-                  badge: const StatusBadge(
-                    label: 'Latest',
-                    type: BadgeType.success,
+                ValueListenableBuilder<String>(
+                  valueListenable: AppVersion.notifier,
+                  builder: (_, ver, __) => _InfoTile(
+                    icon: Icons.tag_rounded,
+                    title: l10n.aboutVersionTitle,
+                    value: ver,
+                    badge: const StatusBadge(
+                      label: 'Latest',
+                      type: BadgeType.success,
+                    ),
                   ),
                 ),
               ],

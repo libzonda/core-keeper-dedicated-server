@@ -244,6 +244,11 @@ class AppLocalizations {
   String get modioTestFailed => _t('modioTestFailed');
   String get modInstallSteamNotice => _t('modInstallSteamNotice');
   String get modioOptionalNotice => _t('modioOptionalNotice');
+  String get modioGlobalNotice => _t('modioGlobalNotice');
+  String get modioKeyEmptyWarning => _t('modioKeyEmptyWarning');
+  String get saveFailed => _t('saveFailed');
+  String get modioClickToEdit => _t('modioClickToEdit');
+  String get modioClickToConfigure => _t('modioClickToConfigure');
 
   String get instancesTitle => _t('instancesTitle');
   String get instancesSubtitle => _t('instancesSubtitle');
@@ -631,6 +636,11 @@ class AppLocalizations {
       'modioTestFailed': '连接失败',
       'modInstallSteamNotice': '创意工坊直接粘贴链接即可，不需要任何配置。',
       'modioOptionalNotice': '创意工坊直接粘贴链接即可，不需要任何配置。此 Key 仅用于 Mod.io 平台。',
+      'modioGlobalNotice': '所有实例全局生效',
+      'modioKeyEmptyWarning': '请先输入 API Key 再进行测试',
+      'saveFailed': '保存失败',
+      'modioClickToEdit': '点击修改 API Key',
+      'modioClickToConfigure': '点击配置 API Key 以启用 Mod.io 下载',
     },
     'en': {
     'create': 'Create',
@@ -929,6 +939,11 @@ class AppLocalizations {
       'modioTestFailed': 'Connection failed',
       'modInstallSteamNotice': 'Steam Workshop mods can be installed directly by pasting the link, no configuration needed.',
       'modioOptionalNotice': 'Steam Workshop mods work directly by pasting the link without any configuration. This key is only for Mod.io.',
+      'modioGlobalNotice': 'Global for all instances',
+      'modioKeyEmptyWarning': 'Please enter an API Key before testing',
+      'saveFailed': 'Save failed',
+      'modioClickToEdit': 'Click to modify API Key',
+      'modioClickToConfigure': 'Click to configure API Key to enable Mod.io downloads',
     },
     'es': {
     'create': 'Crear',
@@ -1227,6 +1242,11 @@ class AppLocalizations {
       'modioTestFailed': 'Error de conexión',
       'modInstallSteamNotice': 'Pegue directamente el enlace de Steam Workshop, no se requiere ninguna configuración.',
       'modioOptionalNotice': 'Steam Workshop funciona directamente pegando el enlace sin configuración. Esta clave es solo para Mod.io.',
+      'modioGlobalNotice': 'Global para todas las instancias',
+      'modioKeyEmptyWarning': 'Por favor ingrese una clave API antes de probar',
+      'saveFailed': 'Error al guardar',
+      'modioClickToEdit': 'Haga clic para modificar la clave API',
+      'modioClickToConfigure': 'Haga clic para configurar la clave API y habilitar las descargas de Mod.io',
     },
     'fr': {
     'create': 'Créer',
@@ -1517,6 +1537,11 @@ class AppLocalizations {
       'modioTestFailed': 'Échec de connexion',
       'modInstallSteamNotice': 'Collez directement le lien Steam Workshop, aucune configuration requise.',
       'modioOptionalNotice': 'Steam Workshop fonctionne directement en collant le lien sans configuration. Cette clé est uniquement pour Mod.io.',
+      'modioGlobalNotice': 'Global pour toutes les instances',
+      'modioKeyEmptyWarning': 'Veuillez saisir une clé API avant de tester',
+      'saveFailed': 'Échec de l’enregistrement',
+      'modioClickToEdit': 'Cliquer pour modifier la clé API',
+      'modioClickToConfigure': 'Cliquer pour configurer la clé API et activer les téléchargements Mod.io',
     },
     'ja': {
     'create': '作成',
@@ -1815,6 +1840,11 @@ class AppLocalizations {
       'modioTestFailed': '接続失敗',
       'modInstallSteamNotice': 'Steamワークショップはリンクを直接貼り付けるだけで利用でき、設定は不要です。',
       'modioOptionalNotice': 'Steamワークショップは設定不要でリンクを貼り付けるだけで利用できます。このキーはMod.io専用です。',
+      'modioGlobalNotice': '全インスタンスで共通',
+      'modioKeyEmptyWarning': 'テストする前にAPIキーを入力してください',
+      'saveFailed': '保存に失敗しました',
+      'modioClickToEdit': 'クリックしてAPIキーを変更',
+      'modioClickToConfigure': 'クリックしてAPIキーを設定し、Mod.ioダウンロードを有効化',
     },
     'ko': {
     'create': '생성',
@@ -2113,6 +2143,11 @@ class AppLocalizations {
       'modioTestFailed': '연결 실패',
       'modInstallSteamNotice': '창작마당은 링크만 직접 붙여넣으면 되며, 아무런 설정도 필요 없습니다.',
       'modioOptionalNotice': 'Steam 창작마당 모드는 설정 없이 링크만 직접 붙여넣으면 됩니다. 이 키는 Mod.io 전용입니다.',
+      'modioGlobalNotice': '모든 인스턴스 전역 적용',
+      'modioKeyEmptyWarning': '테스트하기 전에 API 키를 입력하세요',
+      'saveFailed': '저장 실패',
+      'modioClickToEdit': '클릭하여 API 키 수정',
+      'modioClickToConfigure': '클릭하여 API 키를 설정하고 Mod.io 다운로드 활성화',
     },
     'ru': {
     'create': 'Создать',
@@ -2411,6 +2446,11 @@ class AppLocalizations {
       'modioTestFailed': 'Ошибка соединения',
       'modInstallSteamNotice': 'Для Мастерской (Steam Workshop) достаточно вставить ссылку, настройка не требуется.',
       'modioOptionalNotice': 'Моды из Мастерской не требуют настройки — просто вставьте ссылку. Этот ключ только для Mod.io.',
+      'modioGlobalNotice': 'Действует для всех инстансов',
+      'modioKeyEmptyWarning': 'Пожалуйста, введите API-ключ перед проверкой',
+      'saveFailed': 'Ошибка сохранения',
+      'modioClickToEdit': 'Нажмите, чтобы изменить API-ключ',
+      'modioClickToConfigure': 'Нажмите, чтобы настроить API-ключ и включить загрузку с Mod.io',
     },
   };
 }
