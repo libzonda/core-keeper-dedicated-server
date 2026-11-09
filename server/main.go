@@ -21,7 +21,7 @@ import (
 )
 
 // Version is injected during compilation via -ldflags="-X main.Version=vX.Y.Z"
-var Version = "v0.1.2"
+var Version = "v0.1.3"
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
