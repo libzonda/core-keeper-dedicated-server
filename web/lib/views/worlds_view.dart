@@ -423,13 +423,43 @@ class _WorldsViewState extends State<WorldsView> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          '${_getModeLabel(activeWorld.mode, l10n)}  •  ${activeWorld.formattedSizeWith(l10n.worldNotGenerated)}${activeWorld.formattedCreatedAt.isNotEmpty ? '  •  ${l10n.worldCreatedAt}: ${activeWorld.formattedCreatedAt}' : ''}',
+                          '${_getModeLabel(activeWorld.mode, l10n)}  •  ${activeWorld.formattedSizeWith(activeWorld.isActive ? l10n.worldActivePendingPlayer : l10n.worldNotGenerated)}${activeWorld.formattedCreatedAt.isNotEmpty ? '  •  ${l10n.worldCreatedAt}: ${activeWorld.formattedCreatedAt}' : ''}',
                           style: AppTextStyle.caption1.of(
                             context,
                             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
                             tabular: true,
                           ),
                         ),
+                        if (!activeWorld.exists) ...[
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: (isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.info_outline_rounded,
+                                  size: 14,
+                                  color: isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight,
+                                ),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    l10n.worldPendingGenerationTip,
+                                    style: AppTextStyle.caption2.of(
+                                      context,
+                                      color: isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -467,7 +497,7 @@ class _WorldsViewState extends State<WorldsView> {
                       size: 20,
                     ),
                     title: world.name.isEmpty ? l10n.defaultWorldName : world.name,
-                    subtitle: '${_getModeLabel(world.mode, l10n)}  •  ${world.formattedSizeWith(l10n.worldNotGenerated)}${world.formattedCreatedAt.isNotEmpty ? '  •  ${l10n.worldCreatedAt}: ${world.formattedCreatedAt}' : ''}${world.seed != 0 ? '  •  ${l10n.worldSeed}: ${world.seed}' : ''}',
+                    subtitle: '${_getModeLabel(world.mode, l10n)}  •  ${world.formattedSizeWith(world.isActive ? l10n.worldActivePendingPlayer : l10n.worldNotGenerated)}${world.formattedCreatedAt.isNotEmpty ? '  •  ${l10n.worldCreatedAt}: ${world.formattedCreatedAt}' : ''}${world.seed != 0 ? '  •  ${l10n.worldSeed}: ${world.seed}' : ''}',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [

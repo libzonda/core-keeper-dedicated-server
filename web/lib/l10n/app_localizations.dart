@@ -289,6 +289,8 @@ class AppLocalizations {
   String get currentInstanceLabel => _t('currentInstanceLabel');
   String get noInstancesSidebar => _t('noInstancesSidebar');
   String get worldNotGenerated => _t('worldNotGenerated');
+  String get worldActivePendingPlayer => _t('worldActivePendingPlayer');
+  String get worldPendingGenerationTip => _t('worldPendingGenerationTip');
   String get defaultInstanceName => _t('defaultInstanceName');
   String get defaultWorldName => _t('defaultWorldName');
   String get renameWorld => _t('renameWorld');
@@ -387,6 +389,8 @@ class AppLocalizations {
       'currentInstanceLabel': '实例',
       'noInstancesSidebar': '暂无实例 (点击创建)',
       'worldNotGenerated': '未生成',
+      'worldActivePendingPlayer': '未生成（就绪，等待玩家连入生成）',
+      'worldPendingGenerationTip': '新世界已加载并就绪。Core Keeper 服务端会在首位玩家连入游戏时自动初始化地图数据并生成存档文件（.world.gzip）。',
       'defaultInstanceName': '默认服务器',
       'defaultWorldName': '默认世界',
       'renameWorld': '重命名世界',
@@ -691,6 +695,8 @@ class AppLocalizations {
       'currentInstanceLabel': 'Instance',
       'noInstancesSidebar': 'No Instances (Click to create)',
       'worldNotGenerated': 'Not Generated',
+      'worldActivePendingPlayer': 'Not Generated (Ready, awaiting player join)',
+      'worldPendingGenerationTip': 'New world is loaded and ready. Core Keeper Dedicated Server will generate map data and write the save file (.world.gzip) once the first player joins.',
       'defaultInstanceName': 'Default Server',
       'defaultWorldName': 'Default World',
       'renameWorld': 'Rename World',
@@ -995,6 +1001,8 @@ class AppLocalizations {
       'currentInstanceLabel': 'Instancia',
       'noInstancesSidebar': 'Sin instancias (Crear)',
       'worldNotGenerated': 'No generado',
+      'worldActivePendingPlayer': 'No generado (Listo, esperando jugador)',
+      'worldPendingGenerationTip': 'El nuevo mundo está cargado y listo. El servidor generará los datos del mapa y el archivo de guardado (.world.gzip) en cuanto se una el primer jugador.',
       'defaultInstanceName': 'Servidor predeterminado',
       'defaultWorldName': 'Mundo predeterminado',
       'renameWorld': 'Renombrar mundo',
@@ -1299,6 +1307,8 @@ class AppLocalizations {
       'currentInstanceLabel': 'Instance',
       'noInstancesSidebar': 'Aucune instance (Créer)',
       'worldNotGenerated': 'Non généré',
+      'worldActivePendingPlayer': 'Non généré (Prêt, en attente de joueur)',
+      'worldPendingGenerationTip': 'Le nouveau monde est chargé et prêt. Le serveur générera les données de carte et créera le fichier de sauvegarde (.world.gzip) dès qu’un premier joueur se connectera.',
       'defaultInstanceName': 'Serveur par défaut',
       'defaultWorldName': 'Monde par défaut',
       'renameWorld': 'Renommer le monde',
@@ -1595,6 +1605,8 @@ class AppLocalizations {
       'currentInstanceLabel': 'インスタンス',
       'noInstancesSidebar': 'インスタンスなし (作成)',
       'worldNotGenerated': '未生成',
+      'worldActivePendingPlayer': '未生成（準備完了・プレイヤー参加待ち）',
+      'worldPendingGenerationTip': '新しいワールドが正常に読み込まれました。Core Keeper専用サーバーは最初のプレイヤーがゲームに参加した時点でマップデータを初期化しセーブファイル（.world.gzip）を生成します。',
       'defaultInstanceName': 'デフォルトサーバー',
       'defaultWorldName': 'デフォルトワールド',
       'renameWorld': 'ワールド名を変更',
@@ -1899,6 +1911,8 @@ class AppLocalizations {
       'currentInstanceLabel': '인스턴스',
       'noInstancesSidebar': '인스턴스 없음 (생성)',
       'worldNotGenerated': '생성되지 않음',
+      'worldActivePendingPlayer': '생성되지 않음 (준비됨, 플레이어 접속 대기)',
+      'worldPendingGenerationTip': '새 월드가 로드되어 준비되었습니다. Core Keeper 전용 서버는 첫 번째 플레이어가 접속할 때 맵 데이터를 초기화하고 저장 파일(.world.gzip)을 생성합니다.',
       'defaultInstanceName': '기본 서버',
       'defaultWorldName': '기본 월드',
       'renameWorld': '월드 이름 변경',
@@ -2203,6 +2217,8 @@ class AppLocalizations {
       'currentInstanceLabel': 'Экземпляр',
       'noInstancesSidebar': 'Нет экземпляров (Создать)',
       'worldNotGenerated': 'Не создан',
+      'worldActivePendingPlayer': 'Не создан (Готов, ожидает входа игрока)',
+      'worldPendingGenerationTip': 'Новый мир загружен и готов. Выделенный сервер Core Keeper создаст данные карты и запишет файл сохранения (.world.gzip), как только первый игрок подключится к серверу.',
       'defaultInstanceName': 'Сервер по умолчанию',
       'defaultWorldName': 'Мир по умолчанию',
       'renameWorld': 'Переименовать мир',
