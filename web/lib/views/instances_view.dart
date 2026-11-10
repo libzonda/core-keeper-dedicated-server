@@ -697,8 +697,8 @@ class _InstancesViewState extends State<InstancesView> {
                           ),
                         ),
 
-                        // SDR Game ID banner if available
-                        if (inst.networkMode == 'sdr' && inst.gameId.isNotEmpty) ...[
+                        // Game ID banner if available
+                        if (inst.gameId.isNotEmpty) ...[
                           const SizedBox(height: 10),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

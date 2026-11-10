@@ -806,7 +806,12 @@ func (pm *ProcessManager) watchGameID(dataDir, runDir string) {
 		gid := pm.readGameIDFile(dataDir, runDir)
 		if gid != "" {
 			pm.recordGameID(gid)
-			pm.BroadcastLog(fmt.Sprintf("[Manager] >> Detected SDR Game ID: %s <<", gid))
+			cfg := pm.configMgr.Get()
+			if cfg.NetworkMode == "direct" {
+				pm.BroadcastLog(fmt.Sprintf("[Manager] >> Detected Game ID: %s (Direct Mode) <<", gid))
+			} else {
+				pm.BroadcastLog(fmt.Sprintf("[Manager] >> Detected SDR Game ID: %s <<", gid))
+			}
 			return
 		}
 

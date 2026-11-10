@@ -317,31 +317,46 @@ class _DashboardViewState extends State<DashboardView> {
             )
           else
             CommonCard(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  IconWell(
-                    icon: Icon(
-                      Icons.lan_rounded,
-                      color: isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight,
-                      size: 24,
-                    ),
-                    size: 48,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
+              padding: EdgeInsets.all(isMobile ? 16 : 20),
+              child: isMobile
+                  ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          l10n.directTitle,
-                          style: AppTextStyle.caption1.of(
-                            context,
-                            emphasized: true,
-                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-                          ),
+                        Row(
+                          children: [
+                            IconWell(
+                              icon: Icon(
+                                Icons.lan_rounded,
+                                color: isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight,
+                                size: 22,
+                              ),
+                              size: 40,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      l10n.directTitle,
+                                      style: AppTextStyle.caption1.of(
+                                        context,
+                                        emphasized: true,
+                                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  StatusBadge(
+                                    label: isRunning ? l10n.running : (s?.isStarting == true ? l10n.starting : l10n.offline),
+                                    type: isRunning ? BadgeType.success : (s?.isStarting == true ? BadgeType.warning : BadgeType.neutral),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 10),
                         Text(
                           l10n.directPortLabel(s?.port ?? 27015),
                           style: AppTextStyle.headline.of(
@@ -358,11 +373,161 @@ class _DashboardViewState extends State<DashboardView> {
                             color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
                           ),
                         ),
+                        if (s?.gameId.isNotEmpty == true) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            decoration: ShapeDecoration(
+                              color: primaryColor.withValues(alpha: isDark ? 0.12 : 0.08),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: AppRadius.brSm,
+                                side: BorderSide(color: primaryColor.withValues(alpha: 0.3), width: 0.8),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.vpn_key_rounded, size: 16, color: primaryColor),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'Steam Game ID',
+                                      style: AppTextStyle.caption1.of(context, emphasized: true),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                SelectableText(
+                                  s!.gameId,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    fontFamily: 'monospace',
+                                    letterSpacing: 1.0,
+                                    color: primaryColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                SquircleButton(
+                                  variant: ButtonVariant.primary,
+                                  height: 32,
+                                  icon: const Icon(Icons.copy_rounded, size: 14),
+                                  onPressed: () => _copyToClipboard(s.gameId, l10n.gameIdCopied),
+                                  child: Text(l10n.copyGameId),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            IconWell(
+                              icon: Icon(
+                                Icons.lan_rounded,
+                                color: isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight,
+                                size: 24,
+                              ),
+                              size: 48,
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        l10n.directTitle,
+                                        style: AppTextStyle.caption1.of(
+                                          context,
+                                          emphasized: true,
+                                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      StatusBadge(
+                                        label: isRunning ? l10n.running : (s?.isStarting == true ? l10n.starting : l10n.offline),
+                                        type: isRunning ? BadgeType.success : (s?.isStarting == true ? BadgeType.warning : BadgeType.neutral),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    l10n.directPortLabel(s?.port ?? 27015),
+                                    style: AppTextStyle.headline.of(
+                                      context,
+                                      emphasized: true,
+                                      tabular: true,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    l10n.directTip,
+                                    style: AppTextStyle.caption2.of(
+                                      context,
+                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (s?.gameId.isNotEmpty == true) ...[
+                          const SizedBox(height: 14),
+                          const Divider(height: 1),
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: ShapeDecoration(
+                              color: primaryColor.withValues(alpha: isDark ? 0.12 : 0.08),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: AppRadius.brSm,
+                                side: BorderSide(color: primaryColor.withValues(alpha: 0.3), width: 0.8),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.vpn_key_rounded, size: 18, color: primaryColor),
+                                const SizedBox(width: 10),
+                                Text(
+                                  'Steam Game ID: ',
+                                  style: AppTextStyle.caption1.of(context, emphasized: true),
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: SelectableText(
+                                    s!.gameId,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      fontFamily: 'monospace',
+                                      letterSpacing: 1.0,
+                                      color: primaryColor,
+                                    ),
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                SquircleButton(
+                                  variant: ButtonVariant.primary,
+                                  height: 32,
+                                  icon: const Icon(Icons.copy_rounded, size: 14),
+                                  onPressed: () => _copyToClipboard(s.gameId, l10n.gameIdCopied),
+                                  child: Text(l10n.copyGameId),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
                     ),
-                  ),
-                ],
-              ),
             ),
 
           const SizedBox(height: 16),
