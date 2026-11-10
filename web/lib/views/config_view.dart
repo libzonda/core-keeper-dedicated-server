@@ -183,10 +183,13 @@ class _ConfigViewState extends State<ConfigView> {
       final ok = res['success'] == true;
       final msg = res['message'] as String? ?? (ok ? 'Connected' : 'Failed');
       final latency = (res['latencyMs'] as num?)?.toInt() ?? 0;
+      final err = res['error'] as String?;
 
       setState(() {
         _proxyTestSuccess = ok;
-        _proxyTestMessage = ok && latency > 0 ? '$msg (${latency}ms)' : msg;
+        _proxyTestMessage = ok && latency > 0
+            ? '$msg (${latency}ms)'
+            : (err != null && err.isNotEmpty && !msg.contains(err) ? '$msg: $err' : msg);
 
         if (ok && res['clash'] != null) {
           final clash = res['clash'] as Map<String, dynamic>;
