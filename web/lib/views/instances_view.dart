@@ -465,6 +465,69 @@ class _InstancesViewState extends State<InstancesView> {
                   final inst = _instances[index];
                   final isCurrentActive = inst.id == currentActiveId;
                   final isBusy = _busyInstanceId == inst.id;
+                  final isCardNarrow = constraints.maxWidth < 680;
+
+                  final actionButtons = <Widget>[
+                    if (!isCurrentActive)
+                      SquircleButton(
+                        variant: ButtonVariant.primary,
+                        height: 32,
+                        padding: isMobile ? const EdgeInsets.all(8) : const EdgeInsets.symmetric(horizontal: 12),
+                        icon: const Icon(Icons.swap_horiz_rounded, size: 16),
+                        tooltip: l10n.switchInstance,
+                        onPressed: () => _switchActive(inst),
+                        child: isMobile ? null : Text(l10n.switchInstance),
+                      ),
+                    if (inst.isStopped)
+                      SquircleButton(
+                        variant: ButtonVariant.secondary,
+                        height: 32,
+                        padding: isMobile ? const EdgeInsets.all(8) : const EdgeInsets.symmetric(horizontal: 10),
+                        icon: isBusy
+                            ? const SizedBox(
+                                width: 12,
+                                height: 12,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Icon(Icons.play_arrow_rounded, size: 16),
+                        tooltip: l10n.startServer,
+                        onPressed: isBusy ? null : () => _startInstance(inst),
+                        child: isMobile ? null : Text(l10n.startServer),
+                      )
+                    else ...[
+                      SquircleButton(
+                        variant: ButtonVariant.secondary,
+                        height: 32,
+                        padding: isMobile ? const EdgeInsets.all(8) : const EdgeInsets.symmetric(horizontal: 8),
+                        icon: const Icon(Icons.restart_alt_rounded, size: 15),
+                        tooltip: l10n.restartServer,
+                        onPressed: isBusy ? null : () => _restartInstance(inst),
+                        child: isMobile ? null : Text(l10n.restartServer),
+                      ),
+                      SquircleButton(
+                        variant: ButtonVariant.destructive,
+                        height: 32,
+                        padding: isMobile ? const EdgeInsets.all(8) : const EdgeInsets.symmetric(horizontal: 8),
+                        icon: const Icon(Icons.stop_rounded, size: 15),
+                        tooltip: l10n.stopServer,
+                        onPressed: isBusy ? null : () => _stopInstance(inst),
+                        child: isMobile ? null : Text(l10n.stopServer),
+                      ),
+                    ],
+                    IconButton(
+                      icon: const Icon(Icons.tune_rounded, size: 18),
+                      tooltip: l10n.editInstance,
+                      splashRadius: 18,
+                      onPressed: () => _openEditInstanceDialog(inst),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                      tooltip: l10n.deleteInstance,
+                      splashRadius: 18,
+                      color: Colors.redAccent,
+                      onPressed: () => _deleteInstance(inst),
+                    ),
+                  ];
 
                   return CommonCard(
                     padding: const EdgeInsets.all(18),
@@ -472,111 +535,106 @@ class _InstancesViewState extends State<InstancesView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Top Header Row
-                        Row(
-                          children: [
-                            PulsingDot(
-                              color: inst.isRunning
-                                  ? (isDark ? AppColors.stateSuccessDark : AppColors.stateSuccessLight)
-                                  : (inst.isStarting
-                                      ? (isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight)
-                                      : Colors.grey),
-                              isPulsing: inst.isRunning || inst.isStarting,
-                              size: 10,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
+                        if (isCardNarrow) ...[
+                          Row(
+                            children: [
+                              PulsingDot(
+                                color: inst.isRunning
+                                    ? (isDark ? AppColors.stateSuccessDark : AppColors.stateSuccessLight)
+                                    : (inst.isStarting
+                                        ? (isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight)
+                                        : Colors.grey),
+                                isPulsing: inst.isRunning || inst.isStarting,
+                                size: 10,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Wrap(
+                                  spacing: 6,
+                                  runSpacing: 4,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Text(
                                       inst.name,
                                       style: AppTextStyle.headline.of(context, emphasized: true),
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  if (isCurrentActive) ...[
-                                    StatusBadge(label: l10n.currentManaging, type: BadgeType.primary),
-                                    const SizedBox(width: 6),
+                                    if (isCurrentActive) ...[
+                                      StatusBadge(label: l10n.currentManaging, type: BadgeType.primary),
+                                    ],
+                                    StatusBadge(
+                                      label: _getStatusText(inst.status, l10n),
+                                      type: _getBadgeType(inst.status),
+                                    ),
+                                    if (inst.restartRequired) ...[
+                                      StatusBadge(label: l10n.instanceRestartRequired, type: BadgeType.warning),
+                                    ],
                                   ],
-                                  StatusBadge(
-                                    label: _getStatusText(inst.status, l10n),
-                                    type: _getBadgeType(inst.status),
-                                  ),
-                                  if (inst.restartRequired) ...[
-                                    const SizedBox(width: 6),
-                                    StatusBadge(label: l10n.instanceRestartRequired, type: BadgeType.warning),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: actionButtons,
+                            ),
+                          ),
+                        ] else ...[
+                          Row(
+                            children: [
+                              PulsingDot(
+                                color: inst.isRunning
+                                    ? (isDark ? AppColors.stateSuccessDark : AppColors.stateSuccessLight)
+                                    : (inst.isStarting
+                                        ? (isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight)
+                                        : Colors.grey),
+                                isPulsing: inst.isRunning || inst.isStarting,
+                                size: 10,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        inst.name,
+                                        style: AppTextStyle.headline.of(context, emphasized: true),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    if (isCurrentActive) ...[
+                                      StatusBadge(label: l10n.currentManaging, type: BadgeType.primary),
+                                      const SizedBox(width: 6),
+                                    ],
+                                    StatusBadge(
+                                      label: _getStatusText(inst.status, l10n),
+                                      type: _getBadgeType(inst.status),
+                                    ),
+                                    if (inst.restartRequired) ...[
+                                      const SizedBox(width: 6),
+                                      StatusBadge(label: l10n.instanceRestartRequired, type: BadgeType.warning),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  for (int i = 0; i < actionButtons.length; i++) ...[
+                                    if (i > 0 && i < actionButtons.length - 2) const SizedBox(width: 6),
+                                    actionButtons[i],
                                   ],
                                 ],
                               ),
-                            ),
-                            // Action Buttons
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Switch Button
-                                if (!isCurrentActive)
-                                  SquircleButton(
-                                    variant: ButtonVariant.primary,
-                                    height: 32,
-                                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                                    icon: const Icon(Icons.swap_horiz_rounded, size: 16),
-                                    onPressed: () => _switchActive(inst),
-                                    child: Text(l10n.switchInstance),
-                                  ),
-                                const SizedBox(width: 6),
-                                if (inst.isStopped)
-                                  SquircleButton(
-                                    variant: ButtonVariant.secondary,
-                                    height: 32,
-                                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                                    icon: isBusy
-                                        ? const SizedBox(
-                                            width: 12,
-                                            height: 12,
-                                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                          )
-                                        : const Icon(Icons.play_arrow_rounded, size: 16),
-                                    onPressed: isBusy ? null : () => _startInstance(inst),
-                                    child: Text(l10n.startServer),
-                                  )
-                                else ...[
-                                  SquircleButton(
-                                    variant: ButtonVariant.secondary,
-                                    height: 32,
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                    icon: const Icon(Icons.restart_alt_rounded, size: 15),
-                                    onPressed: isBusy ? null : () => _restartInstance(inst),
-                                    child: Text(l10n.restartServer),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  SquircleButton(
-                                    variant: ButtonVariant.destructive,
-                                    height: 32,
-                                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                                    icon: const Icon(Icons.stop_rounded, size: 15),
-                                    onPressed: isBusy ? null : () => _stopInstance(inst),
-                                    child: Text(l10n.stopServer),
-                                  ),
-                                ],
-                                const SizedBox(width: 4),
-                                IconButton(
-                                  icon: const Icon(Icons.tune_rounded, size: 18),
-                                  tooltip: l10n.editInstance,
-                                  splashRadius: 18,
-                                  onPressed: () => _openEditInstanceDialog(inst),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                                  tooltip: l10n.deleteInstance,
-                                  splashRadius: 18,
-                                  color: Colors.redAccent,
-                                  onPressed: () => _deleteInstance(inst),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                        ],
 
                         const SizedBox(height: 14),
 
@@ -660,18 +718,22 @@ class _InstancesViewState extends State<InstancesView> {
                                   'Game ID: ',
                                   style: AppTextStyle.caption1.of(context, emphasized: true),
                                 ),
-                                SelectableText(
-                                  inst.gameId,
-                                  style: AppTextStyle.caption1.of(context, color: primaryColor, tabular: true),
+                                Expanded(
+                                  child: SelectableText(
+                                    inst.gameId,
+                                    style: AppTextStyle.caption1.of(context, color: primaryColor, tabular: true),
+                                    maxLines: 1,
+                                  ),
                                 ),
-                                const Spacer(),
+                                const SizedBox(width: 8),
                                 SquircleButton(
                                   variant: ButtonVariant.secondary,
                                   height: 26,
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  padding: isMobile ? const EdgeInsets.all(6) : const EdgeInsets.symmetric(horizontal: 8),
                                   icon: const Icon(Icons.copy_rounded, size: 13),
+                                  tooltip: l10n.copyGameId,
                                   onPressed: () => _copyToClipboard(inst.gameId, 'Game ID'),
-                                  child: Text(l10n.copyGameId),
+                                  child: isMobile ? null : Text(l10n.copyGameId),
                                 ),
                               ],
                             ),

@@ -819,19 +819,22 @@ class _ModsViewState extends State<ModsView> {
                           SquircleButton(
                             variant: ButtonVariant.secondary,
                             height: 32,
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            padding: isMobile ? const EdgeInsets.all(8) : const EdgeInsets.symmetric(horizontal: 10),
                             isLoading: _updatingModId == mod.id,
                             icon: const Icon(Icons.sync_rounded, size: 14),
+                            tooltip: l10n.updateMod,
                             onPressed: _updatingModId != null ? null : () => _updateMod(mod),
-                            child: Text(l10n.updateMod),
+                            child: isMobile ? null : Text(l10n.updateMod),
                           ),
                           const SizedBox(width: 8),
                         ],
-                        StatusBadge(
-                          label: mod.enabled ? l10n.modEnabledForInstance : l10n.modDisabledForInstance,
-                          type: mod.enabled ? BadgeType.success : BadgeType.neutral,
-                        ),
-                        const SizedBox(width: 12),
+                        if (!isMobile) ...[
+                          StatusBadge(
+                            label: mod.enabled ? l10n.modEnabledForInstance : l10n.modDisabledForInstance,
+                            type: mod.enabled ? BadgeType.success : BadgeType.neutral,
+                          ),
+                          const SizedBox(width: 12),
+                        ],
                         ElasticSwitch(
                           value: mod.enabled,
                           onChanged: (v) => _toggleMod(mod, v),

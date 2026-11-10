@@ -430,37 +430,140 @@ class _ConfigViewState extends State<ConfigView> {
                     ],
                   ),
                 ] else ...[
+                  if (isMobile) ...[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.serverIp,
+                          style: AppTextStyle.subheadline.of(context, emphasized: true),
+                        ),
+                        const SizedBox(height: 6),
+                        TextField(
+                          controller: _ipCtrl,
+                          decoration: const InputDecoration(hintText: '0.0.0.0'),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          l10n.serverPort,
+                          style: AppTextStyle.subheadline.of(context, emphasized: true),
+                        ),
+                        const SizedBox(height: 6),
+                        TextField(
+                          controller: _portCtrl,
+                          decoration: const InputDecoration(hintText: '27015'),
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.serverIp,
+                                style: AppTextStyle.subheadline.of(context, emphasized: true),
+                              ),
+                              const SizedBox(height: 6),
+                              TextField(
+                                controller: _ipCtrl,
+                                decoration: const InputDecoration(hintText: '0.0.0.0'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.serverPort,
+                                style: AppTextStyle.subheadline.of(context, emphasized: true),
+                              ),
+                              const SizedBox(height: 6),
+                              TextField(
+                                controller: _portCtrl,
+                                decoration: const InputDecoration(hintText: '27015'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ],
+                const SizedBox(height: 16),
+                if (isMobile) ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.serverPassword,
+                        style: AppTextStyle.subheadline.of(context, emphasized: true),
+                      ),
+                      const SizedBox(height: 6),
+                      TextField(
+                        controller: _passwordCtrl,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          hintText: l10n.serverPasswordHint,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        l10n.maxPlayers,
+                        style: AppTextStyle.subheadline.of(context, emphasized: true),
+                      ),
+                      const SizedBox(height: 6),
+                      TextField(
+                        controller: _maxPlayersCtrl,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(hintText: '10'),
+                      ),
+                    ],
+                  ),
+                ] else ...[
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
+                        flex: 2,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              l10n.serverIp,
+                              l10n.serverPassword,
                               style: AppTextStyle.subheadline.of(context, emphasized: true),
                             ),
                             const SizedBox(height: 6),
                             TextField(
-                              controller: _ipCtrl,
-                              decoration: const InputDecoration(hintText: '0.0.0.0'),
+                              controller: _passwordCtrl,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                hintText: l10n.serverPasswordHint,
+                              ),
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
+                        flex: 1,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              l10n.serverPort,
+                              l10n.maxPlayers,
                               style: AppTextStyle.subheadline.of(context, emphasized: true),
                             ),
                             const SizedBox(height: 6),
                             TextField(
-                              controller: _portCtrl,
-                              decoration: const InputDecoration(hintText: '27015'),
+                              controller: _maxPlayersCtrl,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(hintText: '10'),
                             ),
                           ],
                         ),
@@ -468,51 +571,6 @@ class _ConfigViewState extends State<ConfigView> {
                     ],
                   ),
                 ],
-                const SizedBox(height: 16),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      flex: 2,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.serverPassword,
-                            style: AppTextStyle.subheadline.of(context, emphasized: true),
-                          ),
-                          const SizedBox(height: 6),
-                          TextField(
-                            controller: _passwordCtrl,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              hintText: l10n.serverPasswordHint,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.maxPlayers,
-                            style: AppTextStyle.subheadline.of(context, emphasized: true),
-                          ),
-                          const SizedBox(height: 6),
-                          TextField(
-                            controller: _maxPlayersCtrl,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(hintText: '10'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -568,50 +626,81 @@ class _ConfigViewState extends State<ConfigView> {
                   const SizedBox(height: 16),
 
                   if (_proxyType == 'clash') ...[
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.clashApiUrl,
-                                style: AppTextStyle.subheadline.of(context, emphasized: true),
-                              ),
-                              const SizedBox(height: 6),
-                              TextField(
-                                controller: _clashApiUrlCtrl,
-                                decoration: const InputDecoration(
-                                  hintText: 'http://192.168.1.100:9090',
-                                ),
-                              ),
-                            ],
+                    if (isMobile) ...[
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.clashApiUrl,
+                            style: AppTextStyle.subheadline.of(context, emphasized: true),
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.clashSecret,
-                                style: AppTextStyle.subheadline.of(context, emphasized: true),
-                              ),
-                              const SizedBox(height: 6),
-                              TextField(
-                                controller: _clashSecretCtrl,
-                                decoration: InputDecoration(
-                                  hintText: l10n.clashSecretHint,
-                                ),
-                              ),
-                            ],
+                          const SizedBox(height: 6),
+                          TextField(
+                            controller: _clashApiUrlCtrl,
+                            decoration: const InputDecoration(
+                              hintText: 'http://192.168.1.100:9090',
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(height: 12),
+                          Text(
+                            l10n.clashSecret,
+                            style: AppTextStyle.subheadline.of(context, emphasized: true),
+                          ),
+                          const SizedBox(height: 6),
+                          TextField(
+                            controller: _clashSecretCtrl,
+                            decoration: InputDecoration(
+                              hintText: l10n.clashSecretHint,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.clashApiUrl,
+                                  style: AppTextStyle.subheadline.of(context, emphasized: true),
+                                ),
+                                const SizedBox(height: 6),
+                                TextField(
+                                  controller: _clashApiUrlCtrl,
+                                  decoration: const InputDecoration(
+                                    hintText: 'http://192.168.1.100:9090',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.clashSecret,
+                                  style: AppTextStyle.subheadline.of(context, emphasized: true),
+                                ),
+                                const SizedBox(height: 6),
+                                TextField(
+                                  controller: _clashSecretCtrl,
+                                  decoration: InputDecoration(
+                                    hintText: l10n.clashSecretHint,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: 8),
                     Text(
                       l10n.clashTip,
@@ -692,19 +781,20 @@ class _ConfigViewState extends State<ConfigView> {
                               const SizedBox(height: 12),
                               const ListRowSeparator(indent: 0, endIndent: 0),
                               const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  Text(
-                                    l10n.clashSwitchNode,
-                                    style: AppTextStyle.subheadline.of(
-                                      context,
-                                      emphasized: true,
-                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                              if (isMobile) ...[
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l10n.clashSwitchNode,
+                                      style: AppTextStyle.subheadline.of(
+                                        context,
+                                        emphasized: true,
+                                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: DropdownButtonFormField<String>(
+                                    const SizedBox(height: 6),
+                                    DropdownButtonFormField<String>(
                                       initialValue: _clashAvailableNodes.contains(_clashCurrentNode) ? _clashCurrentNode : _clashAvailableNodes.first,
                                       dropdownColor: SurfaceLevel.card.colorOf(context),
                                       isDense: true,
@@ -722,9 +812,43 @@ class _ConfigViewState extends State<ConfigView> {
                                               }
                                             },
                                     ),
-                                  ),
-                                ],
-                              ),
+                                  ],
+                                ),
+                              ] else ...[
+                                Row(
+                                  children: [
+                                    Text(
+                                      l10n.clashSwitchNode,
+                                      style: AppTextStyle.subheadline.of(
+                                        context,
+                                        emphasized: true,
+                                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: DropdownButtonFormField<String>(
+                                        initialValue: _clashAvailableNodes.contains(_clashCurrentNode) ? _clashCurrentNode : _clashAvailableNodes.first,
+                                        dropdownColor: SurfaceLevel.card.colorOf(context),
+                                        isDense: true,
+                                        items: _clashAvailableNodes.map((n) {
+                                          return DropdownMenuItem<String>(
+                                            value: n,
+                                            child: Text(n, overflow: TextOverflow.ellipsis),
+                                          );
+                                        }).toList(),
+                                        onChanged: _switchingNode
+                                            ? null
+                                            : (val) {
+                                                if (val != null && val != _clashCurrentNode) {
+                                                  _switchClashNode(val);
+                                                }
+                                              },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ],
                           ],
                         ),
@@ -838,7 +962,10 @@ class _ConfigViewState extends State<ConfigView> {
 
                   const SizedBox(height: 16),
 
-                  Row(
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       SquircleButton(
                         variant: ButtonVariant.secondary,
@@ -847,7 +974,6 @@ class _ConfigViewState extends State<ConfigView> {
                         onPressed: _testProxy,
                         child: Text(_proxyType == 'clash' ? l10n.testClashNode : l10n.testProxy),
                       ),
-                      const SizedBox(width: 10),
                       SquircleButton(
                         variant: ButtonVariant.primary,
                         icon: const Icon(Icons.save_rounded, size: 16),
@@ -855,7 +981,6 @@ class _ConfigViewState extends State<ConfigView> {
                         onPressed: _saveProxyConfigOnly,
                         child: Text(l10n.saveProxy),
                       ),
-                      const SizedBox(width: 14),
                       if (_proxyTestSuccess != null) ...[
                         StatusBadge(
                           label: _proxyTestMessage ?? '',

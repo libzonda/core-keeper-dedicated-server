@@ -391,40 +391,44 @@ class _WorldsViewState extends State<WorldsView> {
           // Active World Hero Card
           if (activeWorld != null) ...[
             CommonCard(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  IconWell(
-                    icon: Icon(Icons.public_rounded, color: primaryColor, size: 28),
-                    size: 52,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
+              padding: EdgeInsets.all(isMobile ? 16 : 20),
+              child: isMobile
+                  ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            StatusBadge(label: l10n.activeBadge, type: BadgeType.success),
-                            const SizedBox(width: 8),
-                            Flexible(
-                              child: Text(
-                                activeWorld.name.isEmpty ? l10n.defaultWorldName : activeWorld.name,
-                                style: AppTextStyle.headline.of(context, emphasized: true),
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            IconWell(
+                              icon: Icon(Icons.public_rounded, color: primaryColor, size: 24),
+                              size: 44,
                             ),
-                            const SizedBox(width: 6),
-                            IconButton(
-                              icon: const Icon(Icons.edit_outlined, size: 18),
-                              tooltip: l10n.renameWorld,
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                              onPressed: () => _renameWorld(activeWorld),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  StatusBadge(label: l10n.activeBadge, type: BadgeType.success),
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      activeWorld.name.isEmpty ? l10n.defaultWorldName : activeWorld.name,
+                                      style: AppTextStyle.headline.of(context, emphasized: true),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  IconButton(
+                                    icon: const Icon(Icons.edit_outlined, size: 18),
+                                    tooltip: l10n.renameWorld,
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () => _renameWorld(activeWorld),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 10),
                         Text(
                           '${_getModeLabel(activeWorld.mode, l10n)}  •  ${activeWorld.formattedSizeWith(activeWorld.isActive ? l10n.worldActivePendingPlayer : l10n.worldNotGenerated)}${activeWorld.formattedCreatedAt.isNotEmpty ? '  •  ${l10n.worldCreatedAt}: ${activeWorld.formattedCreatedAt}' : ''}',
                           style: AppTextStyle.caption1.of(
@@ -463,18 +467,100 @@ class _WorldsViewState extends State<WorldsView> {
                             ),
                           ),
                         ],
+                        if (activeWorld.exists && activeWorld.sizeBytes > 0) ...[
+                          const SizedBox(height: 12),
+                          SquircleButton(
+                            variant: ButtonVariant.secondary,
+                            icon: const Icon(Icons.download_rounded, size: 16),
+                            onPressed: () => _exportWorld(activeWorld),
+                            child: Text(l10n.exportWorld),
+                          ),
+                        ],
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        IconWell(
+                          icon: Icon(Icons.public_rounded, color: primaryColor, size: 28),
+                          size: 52,
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  StatusBadge(label: l10n.activeBadge, type: BadgeType.success),
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      activeWorld.name.isEmpty ? l10n.defaultWorldName : activeWorld.name,
+                                      style: AppTextStyle.headline.of(context, emphasized: true),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  IconButton(
+                                    icon: const Icon(Icons.edit_outlined, size: 18),
+                                    tooltip: l10n.renameWorld,
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () => _renameWorld(activeWorld),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                '${_getModeLabel(activeWorld.mode, l10n)}  •  ${activeWorld.formattedSizeWith(activeWorld.isActive ? l10n.worldActivePendingPlayer : l10n.worldNotGenerated)}${activeWorld.formattedCreatedAt.isNotEmpty ? '  •  ${l10n.worldCreatedAt}: ${activeWorld.formattedCreatedAt}' : ''}',
+                                style: AppTextStyle.caption1.of(
+                                  context,
+                                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                  tabular: true,
+                                ),
+                              ),
+                              if (!activeWorld.exists) ...[
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: (isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight).withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.info_outline_rounded,
+                                        size: 14,
+                                        color: isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Flexible(
+                                        child: Text(
+                                          l10n.worldPendingGenerationTip,
+                                          style: AppTextStyle.caption2.of(
+                                            context,
+                                            color: isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                        if (activeWorld.exists && activeWorld.sizeBytes > 0)
+                          SquircleButton(
+                            variant: ButtonVariant.secondary,
+                            icon: const Icon(Icons.download_rounded, size: 16),
+                            onPressed: () => _exportWorld(activeWorld),
+                            child: Text(l10n.exportWorld),
+                          ),
                       ],
                     ),
-                  ),
-                  if (activeWorld.exists && activeWorld.sizeBytes > 0)
-                    SquircleButton(
-                      variant: ButtonVariant.secondary,
-                      icon: const Icon(Icons.download_rounded, size: 16),
-                      onPressed: () => _exportWorld(activeWorld),
-                      child: Text(l10n.exportWorld),
-                    ),
-                ],
-              ),
             ),
             const SizedBox(height: 16),
           ],
@@ -528,9 +614,11 @@ class _WorldsViewState extends State<WorldsView> {
                           SquircleButton(
                             variant: ButtonVariant.secondary,
                             height: 32,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            padding: isMobile ? const EdgeInsets.all(8) : const EdgeInsets.symmetric(horizontal: 12),
+                            icon: isMobile ? const Icon(Icons.check_circle_outline_rounded, size: 15) : null,
+                            tooltip: l10n.switchToWorld,
                             onPressed: () => _switchWorld(world),
-                            child: Text(l10n.switchToWorld),
+                            child: isMobile ? null : Text(l10n.switchToWorld),
                           ),
                         const SizedBox(width: 8),
                         if (!world.isActive)

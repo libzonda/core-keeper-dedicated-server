@@ -255,10 +255,11 @@ class _AdminsViewState extends State<AdminsView> {
                         SquircleButton(
                           variant: ButtonVariant.destructive,
                           height: 32,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          padding: isMobile ? const EdgeInsets.all(8) : const EdgeInsets.symmetric(horizontal: 12),
                           icon: const Icon(Icons.delete_outline_rounded, size: 14),
+                          tooltip: l10n.remove,
                           onPressed: () => _deleteAdmin(admin),
-                          child: Text(l10n.remove),
+                          child: isMobile ? null : Text(l10n.remove),
                         ),
                       ],
                     ),

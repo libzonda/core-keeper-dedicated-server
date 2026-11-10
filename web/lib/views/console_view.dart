@@ -305,19 +305,36 @@ class _ConsoleViewState extends State<ConsoleView> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(child: searchInput),
-                      const SizedBox(width: 8),
-                      lockBtn,
-                      const SizedBox(width: 6),
-                      copyBtn,
-                      const SizedBox(width: 6),
-                      exportBtn,
-                      const SizedBox(width: 6),
-                      clearBtn,
-                    ],
-                  ),
+                  if (isMobile) ...[
+                    searchInput,
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        lockBtn,
+                        const SizedBox(width: 6),
+                        copyBtn,
+                        const SizedBox(width: 6),
+                        exportBtn,
+                        const SizedBox(width: 6),
+                        clearBtn,
+                      ],
+                    ),
+                  ] else ...[
+                    Row(
+                      children: [
+                        Expanded(child: searchInput),
+                        const SizedBox(width: 8),
+                        lockBtn,
+                        const SizedBox(width: 6),
+                        copyBtn,
+                        const SizedBox(width: 6),
+                        exportBtn,
+                        const SizedBox(width: 6),
+                        clearBtn,
+                      ],
+                    ),
+                  ],
                 ],
               );
 

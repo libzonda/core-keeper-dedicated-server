@@ -459,8 +459,11 @@ class _DashboardViewState extends State<DashboardView> {
           // Status Metrics Grid with Tabular Numerics
           LayoutBuilder(
             builder: (context, constraints) {
-              final isWide = constraints.maxWidth > 700;
-              final colWidth = isWide ? (constraints.maxWidth - 36) / 4 : (constraints.maxWidth - 12) / 2;
+              final colWidth = constraints.maxWidth > 700
+                  ? (constraints.maxWidth - 36) / 4
+                  : (constraints.maxWidth < 400
+                      ? constraints.maxWidth
+                      : (constraints.maxWidth - 12) / 2);
 
               return Wrap(
                 spacing: 12,
