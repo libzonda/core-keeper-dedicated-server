@@ -10,6 +10,7 @@
 ![Steam App ID](https://img.shields.io/badge/Steam%20AppID-1963720-blue?style=flat-square)
 ![Network Mode](https://img.shields.io/badge/Network%20Mode-Steam%20SDR%20%7C%20Direct-green?style=flat-square)
 ![Flutter Web](https://img.shields.io/badge/Web%20UI-Flutter%203.47%2B-02569B?style=flat-square&logo=flutter)
+[![Docker Pulls](https://img.shields.io/docker/pulls/libzonda/core-keeper-dedicated-server?style=flat-square&logo=docker)](https://hub.docker.com/r/libzonda/core-keeper-dedicated-server)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)
 ![License](https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square)
 
