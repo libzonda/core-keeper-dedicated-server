@@ -342,7 +342,7 @@ class _InstancesViewState extends State<InstancesView> {
                 )
               : null;
 
-          final isButtonCompact = constraints.maxWidth < 850;
+          final isButtonCompact = constraints.maxWidth < 960;
 
           final headerActions = [
             if (topSwitcherPill != null) topSwitcherPill,
@@ -388,18 +388,14 @@ class _InstancesViewState extends State<InstancesView> {
                         children: [
                           Expanded(child: titleSection),
                           const SizedBox(width: 16),
-                          Flexible(
-                            fit: FlexFit.loose,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Wrap(
-                                alignment: WrapAlignment.end,
-                                spacing: 8,
-                                runSpacing: 8,
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: headerActions,
-                              ),
-                            ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              for (int i = 0; i < headerActions.length; i++) ...[
+                                if (i > 0) const SizedBox(width: 8),
+                                headerActions[i],
+                              ],
+                            ],
                           ),
                         ],
                       ),

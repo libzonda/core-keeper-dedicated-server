@@ -35,7 +35,7 @@ class PageHeader extends StatelessWidget {
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 720;
         final isMobile = constraints.maxWidth < 480;
-        final isButtonCompact = constraints.maxWidth < 850;
+        final isButtonCompact = constraints.maxWidth < 960;
 
         final effectiveActions = actionsBuilder != null
             ? actionsBuilder!(context, isButtonCompact)
@@ -112,15 +112,15 @@ class PageHeader extends StatelessWidget {
           );
         }
 
-        final desktopActionsWidget = Align(
-          alignment: Alignment.centerRight,
-          child: Wrap(
-            alignment: WrapAlignment.end,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
-            children: effectiveActions,
-          ),
+        final desktopActionsWidget = Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            for (int i = 0; i < effectiveActions.length; i++) ...[
+              if (i > 0) const SizedBox(width: 8),
+              effectiveActions[i],
+            ],
+          ],
         );
 
         return Column(
@@ -133,10 +133,7 @@ class PageHeader extends StatelessWidget {
                 Expanded(child: titleAndSubtitle),
                 if (effectiveActions.isNotEmpty) ...[
                   const SizedBox(width: 16),
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: desktopActionsWidget,
-                  ),
+                  desktopActionsWidget,
                 ],
               ],
             ),

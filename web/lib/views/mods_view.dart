@@ -518,7 +518,7 @@ class _ModsViewState extends State<ModsView> {
             title: l10n.modsTitle,
             subtitle: '${l10n.modsSharedNotice} (${l10n.enabledModsRatio(_mods.where((m) => m.enabled).length, _mods.length)})',
             actionsBuilder: (context, isCompact) => [
-              CurrentInstanceBadge(onInstanceChanged: _loadMods),
+              CurrentInstanceBadge(onInstanceChanged: _loadMods, isCompact: isCompact),
               SquircleButton(
                 variant: ButtonVariant.secondary,
                 icon: const Icon(Icons.vpn_key_rounded, size: 16),

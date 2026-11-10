@@ -281,7 +281,7 @@ class _ConsoleViewState extends State<ConsoleView> {
                 children: [
                   Expanded(child: titleBlock),
                   const SizedBox(width: 16),
-                  const CurrentInstanceBadge(),
+                  CurrentInstanceBadge(isCompact: isButtonCompact),
                   const SizedBox(width: 10),
                   SizedBox(width: isButtonCompact ? 160 : 200, child: searchInput),
                   const SizedBox(width: 8),
@@ -301,7 +301,7 @@ class _ConsoleViewState extends State<ConsoleView> {
                     children: [
                       Expanded(child: titleBlock),
                       const SizedBox(width: 8),
-                      const CurrentInstanceBadge(),
+                      CurrentInstanceBadge(isCompact: isButtonCompact),
                     ],
                   ),
                   const SizedBox(height: 12),

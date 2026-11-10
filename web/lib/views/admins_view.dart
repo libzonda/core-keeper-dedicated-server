@@ -171,7 +171,7 @@ class _AdminsViewState extends State<AdminsView> {
             title: l10n.adminsTitle,
             subtitle: l10n.adminsSubtitle,
             actionsBuilder: (context, isCompact) => [
-              CurrentInstanceBadge(onInstanceChanged: _loadAdmins),
+              CurrentInstanceBadge(onInstanceChanged: _loadAdmins, isCompact: isCompact),
               SquircleButton(
                 variant: ButtonVariant.primary,
                 icon: const Icon(Icons.person_add_rounded, size: 16),

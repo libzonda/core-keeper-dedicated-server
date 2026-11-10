@@ -361,7 +361,7 @@ class _WorldsViewState extends State<WorldsView> {
             title: l10n.worldsTitle,
             subtitle: l10n.worldsSubtitle,
             actionsBuilder: (context, isCompact) => [
-              CurrentInstanceBadge(onInstanceChanged: _loadWorlds),
+              CurrentInstanceBadge(onInstanceChanged: _loadWorlds, isCompact: isCompact),
               SquircleButton(
                 variant: ButtonVariant.primary,
                 icon: const Icon(Icons.add_rounded, size: 16),

@@ -165,7 +165,7 @@ class _DashboardViewState extends State<DashboardView> {
             title: l10n.dashboardTitle,
             subtitle: l10n.dashboardSubtitle,
             actionsBuilder: (context, isCompact) => [
-              CurrentInstanceBadge(onInstanceChanged: widget.onRefresh),
+              CurrentInstanceBadge(onInstanceChanged: widget.onRefresh, isCompact: isCompact),
               SquircleButton(
                 variant: ButtonVariant.secondary,
                 icon: const Icon(Icons.refresh_rounded, size: 16),

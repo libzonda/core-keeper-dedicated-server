@@ -9,10 +9,12 @@ import 'pulsing_dot.dart';
 
 class CurrentInstanceBadge extends StatelessWidget {
   final VoidCallback? onInstanceChanged;
+  final bool? isCompact;
 
   const CurrentInstanceBadge({
     super.key,
     this.onInstanceChanged,
+    this.isCompact,
   });
 
   @override
@@ -43,6 +45,7 @@ class CurrentInstanceBadge extends StatelessWidget {
             final isSdr = (current?.networkMode ?? 'sdr') == 'sdr';
             final gameIdStr = (isSdr && current?.gameId.isNotEmpty == true) ? '\nGame ID: ${current!.gameId}' : '';
             final tooltipMsg = '${l10n.currentManaging}: $name\n${l10n.networkMode}: ${isSdr ? "Steam SDR" : l10n.direct}\n${l10n.specPort}: $port$gameIdStr\n${l10n.switchInstance}';
+            final compact = isCompact ?? (MediaQuery.sizeOf(context).width < 720);
 
             Widget badgeWidget = Builder(
               builder: (badgeContext) {
@@ -56,7 +59,7 @@ class CurrentInstanceBadge extends StatelessWidget {
                       borderRadius: BorderRadius.circular(AppCorner.full),
                       child: Container(
                         height: 36,
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 10),
                         decoration: ShapeDecoration(
                           color: SurfaceLevel.inset.colorOf(context),
                           shape: StadiumBorder(
@@ -80,66 +83,59 @@ class CurrentInstanceBadge extends StatelessWidget {
                               isPulsing: isRunning || isStarting,
                               size: 7,
                             ),
-                            const SizedBox(width: 7),
+                            const SizedBox(width: 6),
                             Icon(Icons.dns_rounded, size: 14, color: primaryColor),
-                            const SizedBox(width: 5),
-                            if (MediaQuery.sizeOf(context).width >= 520) ...[
+                            if (!compact) ...[
+                              const SizedBox(width: 6),
+                              ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxWidth: 120,
+                                ),
+                                child: Text(
+                                  name,
+                                  style: AppTextStyle.caption1.of(context, emphasized: true),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              // SDR / Direct Mode Tag
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                decoration: BoxDecoration(
+                                  color: isSdr
+                                      ? (isDark ? const Color(0xFF143823) : const Color(0xFFE6F4EA))
+                                      : (isDark ? const Color(0xFF2B2538) : const Color(0xFFF1EBFB)),
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: isSdr
+                                        ? (isDark ? const Color(0xFF34A853).withValues(alpha: 0.6) : const Color(0xFF34A853).withValues(alpha: 0.4))
+                                        : (isDark ? primaryColor.withValues(alpha: 0.5) : primaryColor.withValues(alpha: 0.3)),
+                                    width: 0.6,
+                                  ),
+                                ),
+                                child: Text(
+                                  isSdr ? 'SDR' : l10n.direct,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.3,
+                                    color: isSdr
+                                        ? (isDark ? const Color(0xFF81C995) : const Color(0xFF137333))
+                                        : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
                               Text(
-                                '${l10n.currentInstanceLabel}: ',
+                                '($port)',
                                 style: AppTextStyle.caption2.of(
                                   context,
                                   color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                  tabular: true,
                                 ),
                               ),
                             ],
-                            ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxWidth: MediaQuery.sizeOf(context).width < 520 ? 90 : 130,
-                              ),
-                              child: Text(
-                                name,
-                                style: AppTextStyle.caption1.of(context, emphasized: true),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            // SDR / Direct Mode Tag
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                              decoration: BoxDecoration(
-                                color: isSdr
-                                    ? (isDark ? const Color(0xFF143823) : const Color(0xFFE6F4EA))
-                                    : (isDark ? const Color(0xFF2B2538) : const Color(0xFFF1EBFB)),
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(
-                                  color: isSdr
-                                      ? (isDark ? const Color(0xFF34A853).withValues(alpha: 0.6) : const Color(0xFF34A853).withValues(alpha: 0.4))
-                                      : (isDark ? primaryColor.withValues(alpha: 0.5) : primaryColor.withValues(alpha: 0.3)),
-                                  width: 0.6,
-                                ),
-                              ),
-                              child: Text(
-                                isSdr ? 'SDR' : l10n.direct,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.3,
-                                  color: isSdr
-                                      ? (isDark ? const Color(0xFF81C995) : const Color(0xFF137333))
-                                      : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '($port)',
-                              style: AppTextStyle.caption2.of(
-                                context,
-                                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-                                tabular: true,
-                              ),
-                            ),
                             const SizedBox(width: 4),
                             Icon(
                               Icons.keyboard_arrow_down_rounded,
@@ -154,14 +150,9 @@ class CurrentInstanceBadge extends StatelessWidget {
                 },
               );
 
-            // On mobile / touch devices (< 720dp), do not show hover tooltip popup
-            if (MediaQuery.sizeOf(context).width < 720) {
-              return badgeWidget;
-            }
-
             return Tooltip(
               message: tooltipMsg,
-              waitDuration: const Duration(milliseconds: 500),
+              waitDuration: const Duration(milliseconds: 300),
               child: badgeWidget,
             );
           },
