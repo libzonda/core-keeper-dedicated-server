@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
-import 'package:flutter/services.dart';
 import '../models/instance_item.dart';
 import '../services/api_service.dart';
 import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
+import '../utils/file_picker_helper.dart';
 import '../widgets/app_dialog.dart';
 import '../widgets/common_card.dart';
 import '../widgets/icon_well.dart';
@@ -198,8 +198,9 @@ class _InstancesViewState extends State<InstancesView> {
     }
   }
 
-  void _copyToClipboard(String text, String label) {
-    Clipboard.setData(ClipboardData(text: text));
+  Future<void> _copyToClipboard(String text, String label) async {
+    await copyTextToClipboard(text);
+    if (!mounted) return;
     final l10n = context.l10n;
     _showToast('$label ${l10n.copiedToClipboard}');
   }

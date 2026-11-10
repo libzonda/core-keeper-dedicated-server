@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'dart:html' as html;
 import 'dart:typed_data';
+import 'package:flutter/services.dart';
 
 void pickZipFile(void Function(Uint8List bytes, String filename) onFilePicked) {
   final uploadInput = html.FileUploadInputElement()..accept = '.zip';
@@ -66,7 +67,12 @@ void downloadTextFile(String content, String filename) {
 }
 
 Future<bool> copyTextToClipboard(String text) async {
-  // 1. Try modern navigator.clipboard API if available
+  // 1. Try Flutter framework's native Clipboard.setData
+  try {
+    await Clipboard.setData(ClipboardData(text: text));
+  } catch (_) {}
+
+  // 2. Try modern navigator.clipboard API if available
   try {
     if (html.window.navigator.clipboard != null) {
       await html.window.navigator.clipboard!.writeText(text);
@@ -74,20 +80,28 @@ Future<bool> copyTextToClipboard(String text) async {
     }
   } catch (_) {}
 
-  // 2. Fallback using textarea + execCommand('copy') which works universally on HTTP and HTTPS
+  // 3. Fallback using textarea + execCommand('copy') which works universally on HTTP and HTTPS
   try {
     final textarea = html.TextAreaElement()
       ..value = text
+      ..setAttribute('readonly', '')
       ..style.position = 'fixed'
-      ..style.left = '-9999px'
-      ..style.top = '-9999px'
-      ..style.opacity = '0';
+      ..style.top = '0'
+      ..style.left = '0'
+      ..style.width = '2em'
+      ..style.height = '2em'
+      ..style.padding = '0'
+      ..style.border = 'none'
+      ..style.outline = 'none'
+      ..style.boxShadow = 'none'
+      ..style.background = 'transparent';
     html.document.body?.append(textarea);
     textarea.focus();
     textarea.select();
+    textarea.setSelectionRange(0, text.length);
     final success = html.document.execCommand('copy');
     textarea.remove();
-    if (success) return true;
+    if (success == true) return true;
   } catch (_) {}
 
   return false;

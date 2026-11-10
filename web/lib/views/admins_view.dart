@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
 import '../models/admin_item.dart';
 import '../services/api_service.dart';
 import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
+import '../utils/file_picker_helper.dart';
 import '../widgets/app_dialog.dart';
 import '../widgets/common_card.dart';
 import '../widgets/current_instance_badge.dart';
@@ -135,8 +135,9 @@ class _AdminsViewState extends State<AdminsView> {
     }
   }
 
-  void _copyToClipboard(String text, String tip) {
-    Clipboard.setData(ClipboardData(text: text));
+  Future<void> _copyToClipboard(String text, String tip) async {
+    await copyTextToClipboard(text);
+    if (!mounted) return;
     _showToast(tip);
   }
 

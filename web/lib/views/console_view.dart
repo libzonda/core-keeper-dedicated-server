@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../l10n/app_localizations.dart';
 import '../services/api_service.dart';
@@ -121,9 +120,6 @@ class _ConsoleViewState extends State<ConsoleView> {
     final l10n = context.l10n;
     final text = _logs.join('\n');
     if (text.isEmpty) return;
-    try {
-      await Clipboard.setData(ClipboardData(text: text));
-    } catch (_) {}
     await copyTextToClipboard(text);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
