@@ -341,14 +341,16 @@ class _ConsoleViewState extends State<ConsoleView> {
                     borderRadius: AppRadius.brSm,
                     child: Container(
                       color: SurfaceLevel.block.colorOf(context),
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        padding: const EdgeInsets.all(12),
-                        itemCount: filteredLogs.length,
-                        itemBuilder: (context, index) {
-                          final line = filteredLogs[index];
-                          return _buildLogLine(line, isDark);
-                        },
+                      child: SelectionArea(
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.all(12),
+                          itemCount: filteredLogs.length,
+                          itemBuilder: (context, index) {
+                            final line = filteredLogs[index];
+                            return _buildLogLine(line, isDark);
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -367,7 +369,7 @@ class _ConsoleViewState extends State<ConsoleView> {
       textColor = isDark ? AppColors.stateErrorDark : AppColors.stateErrorLight;
     } else if (line.contains('[SteamCMD]') || line.contains('Warning')) {
       textColor = isDark ? AppColors.stateWarningDark : AppColors.stateWarningLight;
-    } else if (line.contains('[Manager] >> Detected SDR Game ID:')) {
+    } else if (line.contains('[Manager] >> Detected SDR Game ID:') || line.contains('[Manager] >> Detected Game ID:')) {
       textColor = isDark ? AppColors.primaryDark : AppColors.primaryLight;
     } else if (line.contains('[Server]')) {
       textColor = isDark ? const Color(0xFFC4C6CF) : const Color(0xFF2C3038);
@@ -375,7 +377,7 @@ class _ConsoleViewState extends State<ConsoleView> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
-      child: SelectableText(
+      child: Text(
         line,
         style: TextStyle(
           fontFamily: 'monospace',
