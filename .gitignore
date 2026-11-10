@@ -1,5 +1,6 @@
 # Binaries & Builds
 server/corekeeper-manager
+build/
 web/build/
 web/.dart_tool/
 web/.flutter-plugins
