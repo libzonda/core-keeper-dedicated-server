@@ -14,6 +14,7 @@ class PageHeader extends StatelessWidget {
   final String? subtitle;
   final Widget? titleTrailing;
   final List<Widget> actions;
+  final List<Widget> Function(BuildContext context, bool isCompact)? actionsBuilder;
   final Widget? bottom;
 
   const PageHeader({
@@ -22,6 +23,7 @@ class PageHeader extends StatelessWidget {
     this.subtitle,
     this.titleTrailing,
     this.actions = const [],
+    this.actionsBuilder,
     this.bottom,
   });
 
@@ -33,6 +35,11 @@ class PageHeader extends StatelessWidget {
       builder: (context, constraints) {
         final isCompact = constraints.maxWidth < 720;
         final isMobile = constraints.maxWidth < 480;
+        final isButtonCompact = constraints.maxWidth < 850;
+
+        final effectiveActions = actionsBuilder != null
+            ? actionsBuilder!(context, isButtonCompact)
+            : actions;
 
         final titleWidget = Text(
           title,
@@ -76,26 +83,26 @@ class PageHeader extends StatelessWidget {
           ],
         );
 
-        if (actions.isEmpty && bottom == null) {
+        if (effectiveActions.isEmpty && bottom == null) {
           return titleAndSubtitle;
         }
 
-        final actionsWidget = Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: actions,
-        );
-
         if (isCompact) {
+          final compactActionsWidget = Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: effectiveActions,
+          );
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               titleAndSubtitle,
-              if (actions.isNotEmpty) ...[
+              if (effectiveActions.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                actionsWidget,
+                compactActionsWidget,
               ],
               if (bottom != null) ...[
                 const SizedBox(height: 12),
@@ -105,6 +112,17 @@ class PageHeader extends StatelessWidget {
           );
         }
 
+        final desktopActionsWidget = Align(
+          alignment: Alignment.centerRight,
+          child: Wrap(
+            alignment: WrapAlignment.end,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
+            children: effectiveActions,
+          ),
+        );
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -113,9 +131,12 @@ class PageHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(child: titleAndSubtitle),
-                if (actions.isNotEmpty) ...[
+                if (effectiveActions.isNotEmpty) ...[
                   const SizedBox(width: 16),
-                  Flexible(child: actionsWidget),
+                  Flexible(
+                    fit: FlexFit.loose,
+                    child: desktopActionsWidget,
+                  ),
                 ],
               ],
             ),

@@ -46,12 +46,13 @@ class AboutView extends StatelessWidget {
           PageHeader(
             title: l10n.aboutTitle,
             subtitle: l10n.aboutSubtitle,
-            actions: [
+            actionsBuilder: (context, isCompact) => [
               SquircleButton(
                 variant: ButtonVariant.primary,
                 icon: const GithubIcon(size: 16, color: Colors.white),
                 onPressed: () => _launch(repoUrl),
-                child: Text(l10n.visitGithub),
+                tooltip: l10n.visitGithub,
+                child: isCompact ? null : Text(l10n.visitGithub),
               ),
             ],
           ),

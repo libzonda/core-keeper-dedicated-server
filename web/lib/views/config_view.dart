@@ -367,14 +367,15 @@ class _ConfigViewState extends State<ConfigView> {
           PageHeader(
             title: l10n.configTitle,
             subtitle: l10n.configSubtitle,
-            actions: [
+            actionsBuilder: (context, isCompact) => [
               CurrentInstanceBadge(onInstanceChanged: _loadConfig),
               SquircleButton(
                 variant: ButtonVariant.primary,
                 icon: const Icon(Icons.save_rounded, size: 16),
                 isLoading: _saving,
                 onPressed: _saveConfig,
-                child: Text(l10n.saveAllConfig),
+                tooltip: l10n.saveAllConfig,
+                child: isCompact ? null : Text(l10n.saveAllConfig),
               ),
             ],
           ),

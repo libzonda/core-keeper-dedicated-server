@@ -342,18 +342,23 @@ class _InstancesViewState extends State<InstancesView> {
                 )
               : null;
 
+          final isButtonCompact = constraints.maxWidth < 850;
+
           final headerActions = [
             if (topSwitcherPill != null) topSwitcherPill,
-            IconButton(
-              icon: const Icon(Icons.refresh_rounded),
+            SquircleButton(
+              variant: ButtonVariant.secondary,
+              icon: const Icon(Icons.refresh_rounded, size: 16),
               tooltip: l10n.refresh,
               onPressed: _loading ? null : _loadInstances,
+              child: isButtonCompact ? null : Text(l10n.refresh),
             ),
             SquircleButton(
               variant: ButtonVariant.primary,
               icon: const Icon(Icons.add_rounded, size: 18),
               onPressed: _openCreateInstanceDialog,
-              child: Text(l10n.newInstance),
+              tooltip: l10n.newInstance,
+              child: isButtonCompact ? null : Text(l10n.newInstance),
             ),
           ];
 
@@ -383,11 +388,18 @@ class _InstancesViewState extends State<InstancesView> {
                         children: [
                           Expanded(child: titleSection),
                           const SizedBox(width: 16),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: headerActions,
+                          Flexible(
+                            fit: FlexFit.loose,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Wrap(
+                                alignment: WrapAlignment.end,
+                                spacing: 8,
+                                runSpacing: 8,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: headerActions,
+                              ),
+                            ),
                           ),
                         ],
                       ),

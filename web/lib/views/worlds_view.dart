@@ -360,25 +360,28 @@ class _WorldsViewState extends State<WorldsView> {
           PageHeader(
             title: l10n.worldsTitle,
             subtitle: l10n.worldsSubtitle,
-            actions: [
+            actionsBuilder: (context, isCompact) => [
               CurrentInstanceBadge(onInstanceChanged: _loadWorlds),
               SquircleButton(
                 variant: ButtonVariant.primary,
                 icon: const Icon(Icons.add_rounded, size: 16),
                 onPressed: _openCreateWorldDialog,
-                child: Text(l10n.createWorld),
+                tooltip: l10n.createWorld,
+                child: isCompact ? null : Text(l10n.createWorld),
               ),
               SquircleButton(
                 variant: ButtonVariant.secondary,
                 icon: const Icon(Icons.file_upload_outlined, size: 16),
                 onPressed: _handleImportWorld,
-                child: Text(l10n.importWorld),
+                tooltip: l10n.importWorld,
+                child: isCompact ? null : Text(l10n.importWorld),
               ),
               SquircleButton(
                 variant: ButtonVariant.secondary,
                 icon: const Icon(Icons.refresh_rounded, size: 16),
                 onPressed: _loadWorlds,
-                child: Text(l10n.refresh),
+                tooltip: l10n.refresh,
+                child: isCompact ? null : Text(l10n.refresh),
               ),
             ],
           ),

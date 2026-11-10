@@ -170,19 +170,21 @@ class _AdminsViewState extends State<AdminsView> {
           PageHeader(
             title: l10n.adminsTitle,
             subtitle: l10n.adminsSubtitle,
-            actions: [
+            actionsBuilder: (context, isCompact) => [
               CurrentInstanceBadge(onInstanceChanged: _loadAdmins),
               SquircleButton(
                 variant: ButtonVariant.primary,
                 icon: const Icon(Icons.person_add_rounded, size: 16),
                 onPressed: _openAddAdminDialog,
-                child: Text(l10n.addAdmin),
+                tooltip: l10n.addAdmin,
+                child: isCompact ? null : Text(l10n.addAdmin),
               ),
               SquircleButton(
                 variant: ButtonVariant.secondary,
                 icon: const Icon(Icons.refresh_rounded, size: 16),
                 onPressed: _loadAdmins,
-                child: Text(l10n.refresh),
+                tooltip: l10n.refresh,
+                child: isCompact ? null : Text(l10n.refresh),
               ),
             ],
           ),

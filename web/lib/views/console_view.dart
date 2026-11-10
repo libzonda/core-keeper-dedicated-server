@@ -193,6 +193,7 @@ class _ConsoleViewState extends State<ConsoleView> {
       builder: (context, constraints) {
         final isNarrow = constraints.maxWidth < 720;
         final isMobile = constraints.maxWidth < 500;
+        final isButtonCompact = constraints.maxWidth < 1050;
         final horizontalPadding = isMobile ? 12.0 : (isNarrow ? 16.0 : 24.0);
         final verticalPadding = isNarrow ? 16.0 : 24.0;
 
@@ -218,9 +219,6 @@ class _ConsoleViewState extends State<ConsoleView> {
               ),
             ],
           ),
-          actions: const [
-            CurrentInstanceBadge(),
-          ],
         );
 
         // Search Input
@@ -246,8 +244,8 @@ class _ConsoleViewState extends State<ConsoleView> {
           icon: Icon(_autoScroll ? Icons.lock_rounded : Icons.lock_open_rounded, size: 15),
           onPressed: () => setState(() => _autoScroll = !_autoScroll),
           tooltip: _autoScroll ? l10n.lockScroll : l10n.pauseScroll,
-          padding: isMobile ? const EdgeInsets.all(10) : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: isMobile ? null : Text(_autoScroll ? l10n.lockScroll : l10n.pauseScroll),
+          padding: isButtonCompact ? const EdgeInsets.all(10) : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: isButtonCompact ? null : Text(_autoScroll ? l10n.lockScroll : l10n.pauseScroll),
         );
 
         final copyBtn = SquircleButton(
@@ -255,8 +253,8 @@ class _ConsoleViewState extends State<ConsoleView> {
           icon: const Icon(Icons.copy_rounded, size: 15),
           onPressed: _copyAllLogs,
           tooltip: l10n.copyLogs,
-          padding: isMobile ? const EdgeInsets.all(10) : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: isMobile ? null : Text(l10n.copyLogs),
+          padding: isButtonCompact ? const EdgeInsets.all(10) : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: isButtonCompact ? null : Text(l10n.copyLogs),
         );
 
         final exportBtn = SquircleButton(
@@ -264,8 +262,8 @@ class _ConsoleViewState extends State<ConsoleView> {
           icon: const Icon(Icons.download_rounded, size: 15),
           onPressed: _exportLogs,
           tooltip: l10n.exportLogs,
-          padding: isMobile ? const EdgeInsets.all(10) : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: isMobile ? null : Text(l10n.exportLogs),
+          padding: isButtonCompact ? const EdgeInsets.all(10) : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: isButtonCompact ? null : Text(l10n.exportLogs),
         );
 
         final clearBtn = SquircleButton(
@@ -273,8 +271,8 @@ class _ConsoleViewState extends State<ConsoleView> {
           icon: const Icon(Icons.delete_outline_rounded, size: 15),
           onPressed: _clearLogs,
           tooltip: l10n.clearLogs,
-          padding: isMobile ? const EdgeInsets.all(10) : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: isMobile ? null : Text(l10n.clearLogs),
+          padding: isButtonCompact ? const EdgeInsets.all(10) : const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: isButtonCompact ? null : Text(l10n.clearLogs),
         );
 
         // Responsive Header
@@ -283,21 +281,29 @@ class _ConsoleViewState extends State<ConsoleView> {
                 children: [
                   Expanded(child: titleBlock),
                   const SizedBox(width: 16),
-                  SizedBox(width: 200, child: searchInput),
+                  const CurrentInstanceBadge(),
+                  const SizedBox(width: 10),
+                  SizedBox(width: isButtonCompact ? 160 : 200, child: searchInput),
                   const SizedBox(width: 8),
                   lockBtn,
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   copyBtn,
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   exportBtn,
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   clearBtn,
                 ],
               )
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  titleBlock,
+                  Row(
+                    children: [
+                      Expanded(child: titleBlock),
+                      const SizedBox(width: 8),
+                      const CurrentInstanceBadge(),
+                    ],
+                  ),
                   const SizedBox(height: 12),
                   Row(
                     children: [

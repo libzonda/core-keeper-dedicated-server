@@ -517,19 +517,21 @@ class _ModsViewState extends State<ModsView> {
           PageHeader(
             title: l10n.modsTitle,
             subtitle: '${l10n.modsSharedNotice} (${l10n.enabledModsRatio(_mods.where((m) => m.enabled).length, _mods.length)})',
-            actions: [
+            actionsBuilder: (context, isCompact) => [
               CurrentInstanceBadge(onInstanceChanged: _loadMods),
               SquircleButton(
                 variant: ButtonVariant.secondary,
                 icon: const Icon(Icons.vpn_key_rounded, size: 16),
                 onPressed: _openModioConfigDialog,
-                child: Text(l10n.modioConfig),
+                tooltip: l10n.modioConfig,
+                child: isCompact ? null : Text(l10n.modioConfig),
               ),
               SquircleButton(
                 variant: ButtonVariant.secondary,
                 icon: const Icon(Icons.refresh_rounded, size: 16),
                 onPressed: _loadMods,
-                child: Text(l10n.refresh),
+                tooltip: l10n.refresh,
+                child: isCompact ? null : Text(l10n.refresh),
               ),
             ],
           ),

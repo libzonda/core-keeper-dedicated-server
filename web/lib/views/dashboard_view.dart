@@ -164,13 +164,14 @@ class _DashboardViewState extends State<DashboardView> {
           PageHeader(
             title: l10n.dashboardTitle,
             subtitle: l10n.dashboardSubtitle,
-            actions: [
+            actionsBuilder: (context, isCompact) => [
               CurrentInstanceBadge(onInstanceChanged: widget.onRefresh),
               SquircleButton(
                 variant: ButtonVariant.secondary,
                 icon: const Icon(Icons.refresh_rounded, size: 16),
                 onPressed: widget.onRefresh,
-                child: Text(l10n.refresh),
+                tooltip: l10n.refresh,
+                child: isCompact ? null : Text(l10n.refresh),
               ),
             ],
           ),
