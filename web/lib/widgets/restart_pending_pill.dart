@@ -5,6 +5,7 @@ import '../services/restart_state_controller.dart';
 import '../theme/app_motion.dart';
 import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
+import 'app_toast.dart';
 
 class RestartPendingPill extends StatelessWidget {
   final VoidCallback? onRestartSuccess;
@@ -20,7 +21,6 @@ class RestartPendingPill extends StatelessWidget {
 
     controller.setRestarting(true);
     final l10n = context.l10n;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     try {
       await ApiService.instance.restartServer();
@@ -28,35 +28,11 @@ class RestartPendingPill extends StatelessWidget {
       onRestartSuccess?.call();
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.check_circle_rounded,
-                  color: isDark ? AppColors.stateSuccessDark : AppColors.stateSuccessLight,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(l10n.restartTriggered),
-              ],
-            ),
-            backgroundColor: SurfaceLevel.block.colorOf(context),
-            behavior: SnackBarBehavior.floating,
-            shape: AppShape.sm,
-          ),
-        );
+        showAppToast(context, l10n.restartTriggered, type: ToastType.success);
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Restart Failed: $e'),
-            backgroundColor: isDark ? AppColors.stateErrorBgDark : AppColors.stateErrorBgLight,
-            behavior: SnackBarBehavior.floating,
-            shape: AppShape.sm,
-          ),
-        );
+        showAppToast(context, 'Restart Failed: $e', type: ToastType.error);
       }
     } finally {
       controller.setRestarting(false);

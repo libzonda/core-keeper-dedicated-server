@@ -4,6 +4,7 @@ import '../services/api_service.dart';
 import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
 import 'app_dialog.dart';
+import 'app_toast.dart';
 
 /// Checks if server is running, and if so, prompts user to restart the server
 /// so that the latest configuration, world changes, or mod adjustments take effect.
@@ -70,24 +71,7 @@ Future<void> checkAndPromptRestart(
       await ApiService.instance.restartServer();
       onRestartTriggered?.call();
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(
-                  Icons.check_circle_rounded,
-                  color: isDark ? AppColors.stateSuccessDark : AppColors.stateSuccessLight,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Text(l10n.restartTriggered),
-              ],
-            ),
-            backgroundColor: SurfaceLevel.block.colorOf(context),
-            behavior: SnackBarBehavior.floating,
-            shape: AppShape.sm,
-          ),
-        );
+        showAppToast(context, l10n.restartTriggered, type: ToastType.success);
       }
     }
   } catch (_) {}

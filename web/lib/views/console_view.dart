@@ -7,6 +7,7 @@ import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
 import '../utils/file_picker_helper.dart';
 import '../widgets/app_dialog.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/current_instance_badge.dart';
 import '../widgets/page_header.dart';
 import '../widgets/squircle_button.dart';
@@ -122,14 +123,7 @@ class _ConsoleViewState extends State<ConsoleView> {
     if (text.isEmpty) return;
     await copyTextToClipboard(text);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.logsCopied),
-          backgroundColor: SurfaceLevel.block.colorOf(context),
-          behavior: SnackBarBehavior.floating,
-          shape: AppShape.sm,
-        ),
-      );
+      showAppToast(context, l10n.logsCopied, type: ToastType.success);
     }
   }
 
@@ -143,14 +137,7 @@ class _ConsoleViewState extends State<ConsoleView> {
     final filename = 'corekeeper_logs_$timestamp.txt';
     downloadTextFile(text, filename);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.logsExported),
-          backgroundColor: SurfaceLevel.block.colorOf(context),
-          behavior: SnackBarBehavior.floating,
-          shape: AppShape.sm,
-        ),
-      );
+      showAppToast(context, l10n.logsExported, type: ToastType.success);
     }
   }
 

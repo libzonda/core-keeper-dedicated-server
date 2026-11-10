@@ -4,6 +4,7 @@ import '../models/instance_item.dart';
 import '../services/api_service.dart';
 import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
+import 'app_toast.dart';
 import 'pulsing_dot.dart';
 
 /// Opens the dropdown menu for switching between server instances.
@@ -290,21 +291,18 @@ Future<void> showInstanceDropdown({
       final target = instances.where((i) => i.id == selected).firstOrNull;
       final name = target?.name.isNotEmpty == true ? target!.name : selected;
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.instanceSwitchedSuccess(name)),
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 2),
-          ),
+        showAppToast(
+          context,
+          l10n.instanceSwitchedSuccess(name),
+          type: ToastType.success,
         );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${l10n.actionFailed}: $e'),
-            backgroundColor: Colors.redAccent,
-          ),
+        showAppToast(
+          context,
+          '${l10n.actionFailed}: $e',
+          type: ToastType.error,
         );
       }
     }

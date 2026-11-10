@@ -7,6 +7,7 @@ import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
 import '../utils/file_picker_helper.dart';
 import '../widgets/app_dialog.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/common_card.dart';
 import '../widgets/icon_well.dart';
 import '../widgets/instance_manager_dialog.dart';
@@ -84,13 +85,10 @@ class _InstancesViewState extends State<InstancesView> {
 
   void _showToast(String message, {bool isError = false}) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.redAccent : Colors.teal,
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
+    showAppToast(
+      context,
+      message,
+      type: isError ? ToastType.error : ToastType.info,
     );
   }
 

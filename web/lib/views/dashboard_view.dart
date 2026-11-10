@@ -6,6 +6,7 @@ import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
 import '../utils/file_picker_helper.dart';
 import '../widgets/app_dialog.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/common_card.dart';
 import '../widgets/current_instance_badge.dart';
 import '../widgets/icon_well.dart';
@@ -131,16 +132,11 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   void _showToast(String msg, {bool isError = false}) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: isError
-            ? (isDark ? AppColors.stateErrorBgDark : AppColors.stateErrorBgLight)
-            : SurfaceLevel.block.colorOf(context),
-        behavior: SnackBarBehavior.floating,
-        shape: AppShape.sm,
-      ),
+    if (!mounted) return;
+    showAppToast(
+      context,
+      msg,
+      type: isError ? ToastType.error : ToastType.info,
     );
   }
 

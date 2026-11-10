@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
 import 'app_dialog.dart';
+import 'app_toast.dart';
 import 'pulsing_dot.dart';
 import 'squircle_button.dart';
 import 'status_badge.dart';
@@ -204,9 +205,7 @@ class InstanceManagerDialog extends StatefulWidget {
         return true;
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${l10n.actionFailed}: $e'), backgroundColor: Colors.redAccent),
-          );
+          showAppToast(context, '${l10n.actionFailed}: $e', type: ToastType.error);
         }
       }
     }
@@ -324,9 +323,7 @@ class InstanceManagerDialog extends StatefulWidget {
         return true;
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${l10n.actionFailed}: $e'), backgroundColor: Colors.redAccent),
-          );
+          showAppToast(context, '${l10n.actionFailed}: $e', type: ToastType.error);
         }
       }
     }
@@ -336,9 +333,7 @@ class InstanceManagerDialog extends StatefulWidget {
   static Future<bool> openDeleteInstanceDialog(BuildContext context, InstanceItem inst) async {
     final l10n = context.l10n;
     if (inst.isRunning || inst.isStarting) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.cannotDeleteRunningInstance), backgroundColor: Colors.orange),
-      );
+      showAppToast(context, l10n.cannotDeleteRunningInstance, type: ToastType.warning);
       return false;
     }
 
@@ -356,9 +351,7 @@ class InstanceManagerDialog extends StatefulWidget {
         return true;
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('${l10n.actionFailed}: $e'), backgroundColor: Colors.redAccent),
-          );
+          showAppToast(context, '${l10n.actionFailed}: $e', type: ToastType.error);
         }
       }
     }
@@ -413,9 +406,7 @@ class _InstanceManagerDialogState extends State<InstanceManagerDialog> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.actionFailed}: $e'), backgroundColor: Colors.redAccent),
-        );
+        showAppToast(context, '${l10n.actionFailed}: $e', type: ToastType.error);
       }
     }
   }
@@ -428,9 +419,7 @@ class _InstanceManagerDialogState extends State<InstanceManagerDialog> {
       widget.onInstanceChanged();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.actionFailed}: $e'), backgroundColor: Colors.redAccent),
-        );
+        showAppToast(context, '${l10n.actionFailed}: $e', type: ToastType.error);
       }
     }
   }
@@ -443,9 +432,7 @@ class _InstanceManagerDialogState extends State<InstanceManagerDialog> {
       widget.onInstanceChanged();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${l10n.actionFailed}: $e'), backgroundColor: Colors.redAccent),
-        );
+        showAppToast(context, '${l10n.actionFailed}: $e', type: ToastType.error);
       }
     }
   }

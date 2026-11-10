@@ -119,9 +119,15 @@ class AppTheme {
         thickness: 1,
         space: 1,
       ),
-      snackBarTheme: const SnackBarThemeData(
+      snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         shape: AppShape.sm,
+        backgroundColor: colorScheme.brightness == Brightness.dark ? const Color(0xFF23262D) : const Color(0xFF1A1C22),
+        contentTextStyle: const TextStyle(
+          color: Color(0xFFF4F6FA),
+          fontSize: 13.5,
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
