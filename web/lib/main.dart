@@ -16,6 +16,7 @@ import 'views/admins_view.dart';
 import 'views/config_view.dart';
 import 'views/console_view.dart';
 import 'views/dashboard_view.dart';
+import 'views/discord_view.dart';
 import 'views/instances_view.dart';
 import 'views/mods_view.dart';
 import 'views/worlds_view.dart';
@@ -228,6 +229,12 @@ class _MainShellState extends State<MainShell> {
               key: ValueKey('mods_${currentInst}_$_viewRebuildKey'),
             ),
           ),
+          wrapWithBarrierIfNeeded(
+            DiscordView(
+              key: ValueKey('discord_${currentInst}_$_viewRebuildKey'),
+              onConfigSaved: _fetchStatus,
+            ),
+          ),
           AboutView(
             key: ValueKey('about_${currentInst}_$_viewRebuildKey'),
           ),
@@ -242,6 +249,7 @@ class _MainShellState extends State<MainShell> {
           DockDestination(icon: Icons.admin_panel_settings_rounded, label: l10n.navAdmins),
           DockDestination(icon: Icons.public_rounded, label: l10n.navWorlds),
           DockDestination(icon: Icons.extension_rounded, label: l10n.navMods),
+          DockDestination(icon: Icons.notifications_active_rounded, label: l10n.navDiscord),
           DockDestination(icon: Icons.info_outline_rounded, label: l10n.navAbout),
         ];
 

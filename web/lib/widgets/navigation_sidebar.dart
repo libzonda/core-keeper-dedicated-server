@@ -62,6 +62,7 @@ class NavigationSidebar extends StatelessWidget {
       (Icons.admin_panel_settings_rounded, l10n.navAdmins),
       (Icons.public_rounded, l10n.navWorlds),
       (Icons.extension_rounded, l10n.navMods),
+      (Icons.notifications_active_rounded, l10n.navDiscord),
       (Icons.info_outline_rounded, l10n.navAbout),
     ];
 

@@ -20,6 +20,7 @@ class AppLocalizations {
   String get navAdmins => _t('navAdmins');
   String get navWorlds => _t('navWorlds');
   String get navMods => _t('navMods');
+  String get navDiscord => _t('navDiscord');
   String get navAbout => _t('navAbout');
   String get navMore => _t('navMore');
   String get allFeatures => _t('allFeatures');
@@ -109,6 +110,7 @@ class AppLocalizations {
   String get confirmSaveConfigTitle => _t('confirmSaveConfigTitle');
   String get confirmSaveConfigDesc => _t('confirmSaveConfigDesc');
   String get configSaved => _t('configSaved');
+  String get discordSaved => _t('discordSaved');
   String get networkModeTitle => _t('networkModeTitle');
   String get sdrModeTitle => _t('sdrModeTitle');
   String get sdrModeSubtitle => _t('sdrModeSubtitle');
@@ -144,6 +146,33 @@ class AppLocalizations {
   String get proxySteamCmdDesc => _t('proxySteamCmdDesc');
   String get proxyMods => _t('proxyMods');
   String get proxyModsDesc => _t('proxyModsDesc');
+  String get proxyDiscord => _t('proxyDiscord');
+  String get proxyDiscordDesc => _t('proxyDiscordDesc');
+
+  String get discordWebhookSection => _t('discordWebhookSection');
+  String get discordWebhookSectionDesc => _t('discordWebhookSectionDesc');
+  String get enableDiscordWebhook => _t('enableDiscordWebhook');
+  String get enableDiscordWebhookDesc => _t('enableDiscordWebhookDesc');
+  String get discordWebhookUrl => _t('discordWebhookUrl');
+  String get discordWebhookUrlHint => _t('discordWebhookUrlHint');
+  String get discordBotName => _t('discordBotName');
+  String get discordBotNameHint => _t('discordBotNameHint');
+  String get discordAvatarUrl => _t('discordAvatarUrl');
+  String get discordAvatarUrlHint => _t('discordAvatarUrlHint');
+  String get discordTestBtn => _t('discordTestBtn');
+  String get discordTesting => _t('discordTesting');
+  String get discordMsgEvents => _t('discordMsgEvents');
+  String get discordMsgEventsDesc => _t('discordMsgEventsDesc');
+  String get discordResetDefault => _t('discordResetDefault');
+  String get discordColor => _t('discordColor');
+  String get discordMsgTitle => _t('discordMsgTitle');
+  String get discordMsgDesc => _t('discordMsgDesc');
+  String get discordAvailVars => _t('discordAvailVars');
+  String get discordEventOnline => _t('discordEventOnline');
+  String get discordEventOffline => _t('discordEventOffline');
+  String get discordEventCrashed => _t('discordEventCrashed');
+  String get discordEventPlayerJoin => _t('discordEventPlayerJoin');
+  String get discordEventPlayerLeave => _t('discordEventPlayerLeave');
   String get coreSettingsTitle => _t('coreSettingsTitle');
   String get worldName => _t('worldName');
   String get worldSeed => _t('worldSeed');
@@ -438,6 +467,7 @@ class AppLocalizations {
       'navAdmins': '管理员设置',
       'navWorlds': '世界存档',
       'navMods': 'MOD 管理',
+      'navDiscord': 'Discord 通知',
       'navAbout': '关于项目',
       'navMore': '更多',
       'allFeatures': '全部功能导航',
@@ -518,6 +548,7 @@ class AppLocalizations {
       'confirmSaveConfigTitle': '确认保存服务器配置？',
       'confirmSaveConfigDesc': '配置将写入 ServerConfig.json 与环境变量。修改的参数将在重启服务器后生效。',
       'configSaved': '配置已保存成功！',
+      'discordSaved': 'Discord Webhook 配置已保存！',
       'networkModeTitle': '网络架构模式 (Network Mode)',
       'sdrModeTitle': 'Steam SDR 中继模式 (推荐)',
       'sdrModeSubtitle': '零配置 NAT 穿透，自动分配 Game ID，无需公网 IP 或路由器端口映射',
@@ -553,6 +584,32 @@ class AppLocalizations {
       'proxySteamCmdDesc': '为服务端版本检查、更新与校验启用代理',
       'proxyMods': '启用 MOD 下载代理',
       'proxyModsDesc': '为 steam 创意工坊 和 Mod.io 模组下载启用代理',
+      'proxyDiscord': '启用 Discord 代理',
+      'proxyDiscordDesc': '为 Discord Webhook 通知推送启用代理',
+      'discordWebhookSection': 'Discord Webhook 通知',
+      'discordWebhookSectionDesc': '配置服务器事件自动推送到 Discord 频道，支持高度自定义消息内容与色彩',
+      'enableDiscordWebhook': '启用 Discord Webhook',
+      'enableDiscordWebhookDesc': '全局启用或停用本实例的 Discord 消息通知',
+      'discordWebhookUrl': 'Webhook URL',
+      'discordWebhookUrlHint': 'https://discord.com/api/webhooks/...',
+      'discordBotName': '自定义机器人名称',
+      'discordBotNameHint': 'Core Keeper Bot (留空使用默认)',
+      'discordAvatarUrl': '自定义头像 URL',
+      'discordAvatarUrlHint': 'https://... (留空使用默认)',
+      'discordTestBtn': '发送测试消息',
+      'discordTesting': '正在发送测试消息...',
+      'discordMsgEvents': '事件通知模版与消息定制',
+      'discordMsgEventsDesc': '单独控制每个事件的开关、侧边栏色彩、消息标题与描述内容',
+      'discordResetDefault': '恢复默认模版',
+      'discordColor': '卡片色彩 (HEX)',
+      'discordMsgTitle': '消息标题',
+      'discordMsgDesc': '消息正文 (Markdown & 变量)',
+      'discordAvailVars': '支持的变量 (点击插入)',
+      'discordEventOnline': '🟢 服务端就绪 (Online)',
+      'discordEventOffline': '⚪ 服务端停止 (Offline)',
+      'discordEventCrashed': '🔴 异常崩溃 (Crashed)',
+      'discordEventPlayerJoin': '🎮 玩家加入 (Player Join)',
+      'discordEventPlayerLeave': '👋 玩家离开 (Player Leave)',
       'coreSettingsTitle': '游戏核心参数',
       'worldName': '世界显示名称 (Server Name)',
       'worldSeed': '世界生成种子 (World Seed)',
@@ -746,6 +803,7 @@ class AppLocalizations {
       'navAdmins': 'Admins',
       'navWorlds': 'Worlds',
       'navMods': 'Mod Manager',
+      'navDiscord': 'Discord',
       'navAbout': 'About',
       'navMore': 'More',
       'allFeatures': 'All Features',
@@ -826,6 +884,7 @@ class AppLocalizations {
       'confirmSaveConfigTitle': 'Save Server Configuration?',
       'confirmSaveConfigDesc': 'Settings will be written to ServerConfig.json and environment. Requires restart.',
       'configSaved': 'Configuration saved successfully!',
+      'discordSaved': 'Discord Webhook configuration saved successfully!',
       'networkModeTitle': 'Network Architecture Mode',
       'sdrModeTitle': 'Steam SDR Relay Mode (Recommended)',
       'sdrModeSubtitle': 'Zero-config NAT traversal, automatic Game ID, no port forwarding required',
@@ -861,6 +920,32 @@ class AppLocalizations {
       'proxySteamCmdDesc': 'Route SteamCMD server update and validation through the proxy',
       'proxyMods': 'Enable MOD Download Proxy',
       'proxyModsDesc': 'Route Steam Workshop and Mod.io downloads through the proxy',
+      'proxyDiscord': 'Enable Discord Proxy',
+      'proxyDiscordDesc': 'Route Discord Webhook notification requests through the proxy',
+      'discordWebhookSection': 'Discord Webhook Notifications',
+      'discordWebhookSectionDesc': 'Automatically push server events to Discord channels with custom colors and content',
+      'enableDiscordWebhook': 'Enable Discord Webhook',
+      'enableDiscordWebhookDesc': 'Master switch for Discord notifications on this instance',
+      'discordWebhookUrl': 'Webhook URL',
+      'discordWebhookUrlHint': 'https://discord.com/api/webhooks/...',
+      'discordBotName': 'Custom Bot Name',
+      'discordBotNameHint': 'Core Keeper Bot (leave empty for default)',
+      'discordAvatarUrl': 'Custom Avatar URL',
+      'discordAvatarUrlHint': 'https://... (leave empty for default)',
+      'discordTestBtn': 'Send Test Notification',
+      'discordTesting': 'Sending test notification...',
+      'discordMsgEvents': 'Event Message Templates',
+      'discordMsgEventsDesc': 'Individually toggle events, customize embed colors, titles, and descriptions',
+      'discordResetDefault': 'Reset to Default',
+      'discordColor': 'Embed Color (HEX)',
+      'discordMsgTitle': 'Message Title',
+      'discordMsgDesc': 'Message Body (Markdown & Variables)',
+      'discordAvailVars': 'Available Variables (Click to insert)',
+      'discordEventOnline': '🟢 Server Online',
+      'discordEventOffline': '⚪ Server Offline',
+      'discordEventCrashed': '🔴 Server Crashed',
+      'discordEventPlayerJoin': '🎮 Player Joined',
+      'discordEventPlayerLeave': '👋 Player Left',
       'coreSettingsTitle': 'Game Core Settings',
       'worldName': 'Server Display Name',
       'worldSeed': 'World Generation Seed',

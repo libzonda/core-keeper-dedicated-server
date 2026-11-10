@@ -48,6 +48,7 @@ class _ConfigViewState extends State<ConfigView> {
   bool _proxySDR = true;
   bool _proxySteamCmd = true;
   bool _proxyMods = true;
+  bool _proxyDiscord = true;
   String _proxyType = 'http';
   final _proxyAddressCtrl = TextEditingController();
   final _clashApiUrlCtrl = TextEditingController();
@@ -122,6 +123,7 @@ class _ConfigViewState extends State<ConfigView> {
         _proxySDR = cfg.proxySDR;
         _proxySteamCmd = cfg.proxySteamCmd;
         _proxyMods = cfg.proxyMods;
+        _proxyDiscord = cfg.proxyDiscord;
         _proxyType = cfg.proxyType.isNotEmpty ? cfg.proxyType : 'http';
         _proxyAddressCtrl.text = cfg.proxyAddress;
         _clashApiUrlCtrl.text = cfg.clashApiUrl.isNotEmpty ? cfg.clashApiUrl : 'http://127.0.0.1:9090';
@@ -253,6 +255,7 @@ class _ConfigViewState extends State<ConfigView> {
         proxySDR: _proxySDR,
         proxySteamCmd: _proxySteamCmd,
         proxyMods: _proxyMods,
+        proxyDiscord: _proxyDiscord,
         proxyType: _proxyType,
         proxyAddress: _proxyAddressCtrl.text.trim(),
         clashApiUrl: _clashApiUrlCtrl.text.trim(),
@@ -307,12 +310,14 @@ class _ConfigViewState extends State<ConfigView> {
         proxySDR: _proxySDR,
         proxySteamCmd: _proxySteamCmd,
         proxyMods: _proxyMods,
+        proxyDiscord: _proxyDiscord,
         proxyType: _proxyType,
         proxyAddress: _proxyAddressCtrl.text.trim(),
         clashApiUrl: _clashApiUrlCtrl.text.trim(),
         clashSecret: _clashSecretCtrl.text.trim(),
         clashNode: _clashCurrentNode ?? '',
         clashGroup: _clashCurrentGroup ?? '',
+        discord: _config?.discord ?? DiscordConfig(),
       );
 
       await ApiService.instance.saveConfig(updated);
@@ -954,6 +959,17 @@ class _ConfigViewState extends State<ConfigView> {
                       onChanged: (v) => setState(() => _proxyMods = v),
                     ),
                     onTap: () => setState(() => _proxyMods = !_proxyMods),
+                  ),
+                  const ListRowSeparator(indent: 0, endIndent: 0),
+                  ListRow(
+                    title: l10n.proxyDiscord,
+                    subtitle: l10n.proxyDiscordDesc,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    trailing: ElasticSwitch(
+                      value: _proxyDiscord,
+                      onChanged: (v) => setState(() => _proxyDiscord = v),
+                    ),
+                    onTap: () => setState(() => _proxyDiscord = !_proxyDiscord),
                   ),
 
                   const SizedBox(height: 16),

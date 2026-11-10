@@ -9,10 +9,17 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
+)
+
+var (
+	rePlayerConnect    = regexp.MustCompile(`(?i)(?:player entity.*?player\s+|player\s+['"]?)([^'"\n\r]+?)['"]?\s+connected`)
+	rePlayerDisconnect = regexp.MustCompile(`(?i)(?:player entity.*?player\s+|player\s+['"]?)([^'"\n\r]+?)['"]?\s+disconnected`)
 )
 
 type ServerStatus string
@@ -60,6 +67,8 @@ type ProcessManager struct {
 	detectedGameID  string
 	restartRequired bool
 	prepareSandbox  func() (string, error)
+	onlineNotified  bool
+	manualStop      bool
 }
 
 func NewProcessManager(cm *ConfigManager) *ProcessManager {
@@ -185,6 +194,8 @@ func (pm *ProcessManager) Start() error {
 	pm.status = StatusStarting
 	pm.detectedGameID = ""
 	pm.restartRequired = false
+	pm.onlineNotified = false
+	pm.manualStop = false
 	// Reset log buffer so only current startup logs are shown
 	pm.logRing = make([]string, 0, pm.maxLogLines)
 	pm.mu.Unlock()
@@ -204,6 +215,7 @@ func (pm *ProcessManager) Stop() error {
 		return fmt.Errorf("server is not running")
 	}
 	pm.status = StatusStopping
+	pm.manualStop = true
 	cmd := pm.cmd
 	updateCmd := pm.updateCmd
 	cancelUpdate := pm.cancelUpdate
@@ -677,15 +689,105 @@ func (pm *ProcessManager) runServer() {
 	err = cmd.Wait()
 
 	pm.mu.Lock()
+	wasManual := pm.manualStop
+	startTime := pm.startTime
 	pm.status = StatusStopped
 	pm.cmd = nil
+	pm.onlineNotified = false
 	pm.mu.Unlock()
+
+	uptimeSec := int64(0)
+	if !startTime.IsZero() {
+		uptimeSec = int64(time.Since(startTime).Seconds())
+	}
+	uptimeStr := formatUptime(uptimeSec)
 
 	if err != nil {
 		pm.BroadcastLog(fmt.Sprintf("[Manager] Server process exited with code/error: %v", err))
+		if !wasManual {
+			exitCode := "unknown"
+			if exitErr, ok := err.(*exec.ExitError); ok {
+				exitCode = strconv.Itoa(exitErr.ExitCode())
+			}
+			logs := pm.GetLogs()
+			recentLogs := ""
+			startIdx := len(logs) - 15
+			if startIdx < 0 {
+				startIdx = 0
+			}
+			if len(logs) > 0 {
+				recentLogs = strings.Join(logs[startIdx:], "\n")
+			}
+			NotifyDiscordEvent(cfg, "server_crashed", map[string]string{
+				"server_name": cfg.WorldName,
+				"exit_code":   exitCode,
+				"error_log":   recentLogs,
+			})
+		} else {
+			NotifyDiscordEvent(cfg, "server_offline", map[string]string{
+				"server_name": cfg.WorldName,
+				"uptime":      uptimeStr,
+			})
+		}
 	} else {
 		pm.BroadcastLog("[Manager] Server process exited cleanly.")
+		NotifyDiscordEvent(cfg, "server_offline", map[string]string{
+			"server_name": cfg.WorldName,
+			"uptime":      uptimeStr,
+		})
 	}
+}
+
+func (pm *ProcessManager) notifyServerOnline(gameID string) {
+	pm.mu.Lock()
+	if pm.onlineNotified {
+		pm.mu.Unlock()
+		return
+	}
+	pm.onlineNotified = true
+	pm.mu.Unlock()
+
+	cfg := pm.configMgr.Get()
+	if gameID == "" {
+		gameID = pm.detectedGameID
+	}
+	if gameID == "" {
+		gameID = cfg.GameID
+	}
+	if gameID == "" && cfg.NetworkMode == "direct" {
+		gameID = fmt.Sprintf("%s:%d", cfg.IP, cfg.Port)
+	}
+
+	modeName := "Steam SDR"
+	if cfg.NetworkMode == "direct" {
+		modeName = fmt.Sprintf("Direct IP (%s:%d)", cfg.IP, cfg.Port)
+	}
+
+	vars := map[string]string{
+		"server_name":  cfg.WorldName,
+		"game_id":      gameID,
+		"network_mode": modeName,
+		"world_name":   cfg.WorldName,
+		"world_index":  strconv.Itoa(cfg.WorldIndex),
+		"max_players":  strconv.Itoa(cfg.MaxPlayers),
+	}
+	NotifyDiscordEvent(cfg, "server_online", vars)
+}
+
+func formatUptime(seconds int64) string {
+	if seconds < 0 {
+		seconds = 0
+	}
+	hours := seconds / 3600
+	minutes := (seconds % 3600) / 60
+	secs := seconds % 60
+	if hours > 0 {
+		return fmt.Sprintf("%dh %dm %ds", hours, minutes, secs)
+	}
+	if minutes > 0 {
+		return fmt.Sprintf("%dm %ds", minutes, secs)
+	}
+	return fmt.Sprintf("%ds", secs)
 }
 
 func (pm *ProcessManager) streamPipe(r io.Reader, prefix string) {
@@ -697,6 +799,31 @@ func (pm *ProcessManager) streamPipe(r io.Reader, prefix string) {
 			continue
 		}
 		pm.BroadcastLog(fmt.Sprintf("%s %s", prefix, text))
+
+		// Check player connect / disconnect
+		if matches := rePlayerConnect.FindStringSubmatch(text); len(matches) > 1 {
+			pName := strings.TrimSpace(matches[1])
+			if pName != "" && !strings.Contains(strings.ToLower(pName), "connected") {
+				go func(name string) {
+					c := pm.configMgr.Get()
+					NotifyDiscordEvent(c, "player_join", map[string]string{
+						"player_name": name,
+						"server_name": c.WorldName,
+					})
+				}(pName)
+			}
+		} else if matches := rePlayerDisconnect.FindStringSubmatch(text); len(matches) > 1 {
+			pName := strings.TrimSpace(matches[1])
+			if pName != "" && !strings.Contains(strings.ToLower(pName), "disconnected") {
+				go func(name string) {
+					c := pm.configMgr.Get()
+					NotifyDiscordEvent(c, "player_leave", map[string]string{
+						"player_name": name,
+						"server_name": c.WorldName,
+					})
+				}(pName)
+			}
+		}
 
 		// Check if log contains Game ID output
 		if strings.Contains(text, "Started session with info:") {
@@ -745,6 +872,7 @@ func (pm *ProcessManager) recordGameID(gid string) {
 	if cfg.DataDir != "" {
 		_ = os.WriteFile(filepath.Join(cfg.DataDir, "GameID.txt"), []byte(gid+"\n"), 0644)
 	}
+	pm.notifyServerOnline(gid)
 }
 
 // scanLinesOrCR splits input by either newline (\n) or carriage return (\r)
@@ -813,6 +941,11 @@ func (pm *ProcessManager) watchGameID(dataDir, runDir string) {
 				pm.BroadcastLog(fmt.Sprintf("[Manager] >> Detected SDR Game ID: %s <<", gid))
 			}
 			return
+		}
+
+		if i == 8 {
+			cfg := pm.configMgr.Get()
+			pm.notifyServerOnline(cfg.GameID)
 		}
 
 		time.Sleep(2 * time.Second)

@@ -21,7 +21,7 @@ import (
 )
 
 // Version is injected during compilation via -ldflags="-X main.Version=vX.Y.Z"
-var Version = "v0.1.9"
+var Version = "v0.2.0"
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -616,6 +616,7 @@ func main() {
 			ProxySDR      *bool  `json:"proxySDR"`
 			ProxySteamCmd *bool  `json:"proxySteamCmd"`
 			ProxyMods     *bool  `json:"proxyMods"`
+			ProxyDiscord  *bool  `json:"proxyDiscord"`
 			ProxyType     string `json:"proxyType"`
 			ProxyAddress  string `json:"proxyAddress"`
 			ClashApiUrl   string `json:"clashApiUrl"`
@@ -640,13 +641,114 @@ func main() {
 		if req.ProxyMods != nil {
 			mods = *req.ProxyMods
 		}
+		discord := cur.ProxyDiscord
+		if req.ProxyDiscord != nil {
+			discord = *req.ProxyDiscord
+		}
 
-		if err := runtime.ConfigMgr.UpdateProxy(req.ProxyEnabled, sdr, steamcmd, mods, req.ProxyType, req.ProxyAddress, req.ClashApiUrl, req.ClashSecret, req.ClashNode, req.ClashGroup); err != nil {
+		if err := runtime.ConfigMgr.UpdateProxy(req.ProxyEnabled, sdr, steamcmd, mods, discord, req.ProxyType, req.ProxyAddress, req.ClashApiUrl, req.ClashSecret, req.ClashNode, req.ClashGroup); err != nil {
 			http.Error(w, "Failed to save proxy config: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		runtime.ProcMgr.SetRestartRequired(true)
 		writeJSON(w, runtime.ConfigMgr.Get())
+	})
+
+	// Discord Webhook Test
+	mux.HandleFunc("/api/discord/test", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		var req DiscordTestRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		runtime := resolveRuntime(w, r)
+		var cfg ServerConfig
+		if runtime != nil {
+			cfg = runtime.ConfigMgr.Get()
+		} else {
+			cfg = globalConfigMgr.Get()
+		}
+
+		webhookURL := strings.TrimSpace(req.WebhookURL)
+		if webhookURL == "" {
+			webhookURL = strings.TrimSpace(cfg.Discord.WebhookURL)
+		}
+		if webhookURL == "" {
+			writeJSON(w, DiscordTestResponse{
+				Success: false,
+				Message: "Webhook URL 不能为空",
+				Error:   "webhook url is empty",
+			})
+			return
+		}
+
+		botName := strings.TrimSpace(req.BotName)
+		if botName == "" {
+			botName = cfg.Discord.BotName
+		}
+		if botName == "" {
+			botName = "Core Keeper Bot"
+		}
+
+		avatarURL := strings.TrimSpace(req.AvatarURL)
+		if avatarURL == "" {
+			avatarURL = cfg.Discord.AvatarURL
+		}
+		if avatarURL == "" {
+			avatarURL = "https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/logo.png"
+		}
+
+		var proxyURL string
+		useProxy := cfg.ProxyEnabled && cfg.ProxyDiscord
+		if useProxy {
+			proxyURL, _ = GetEffectiveProxyURL(cfg)
+		}
+
+		proxyStatus := "Direct / Disabled"
+		if useProxy {
+			proxyStatus = "Enabled (" + proxyURL + ")"
+		}
+
+		testPayload := DiscordWebhookPayload{
+			Username:  botName,
+			AvatarURL: avatarURL,
+			Embeds: []DiscordEmbed{
+				{
+					Title:       "🔔 Core Keeper Webhook Test",
+					Description: fmt.Sprintf("Congratulations! Discord Webhook test succeeded.\n• **Instance**: %s\n• **Proxy**: %s\n• **Timestamp**: %s", cfg.WorldName, proxyStatus, time.Now().UTC().Format("2006-01-02 15:04:05 UTC")),
+					Color:       0x2ECC71,
+					Footer: &DiscordEmbedFooter{
+						Text: fmt.Sprintf("Core Keeper Dedicated Server Manager • %s", Version),
+					},
+					Timestamp: time.Now().UTC().Format(time.RFC3339),
+				},
+			},
+		}
+
+		start := time.Now()
+		err := SendDiscordWebhook(webhookURL, testPayload, proxyURL, useProxy)
+		latency := time.Since(start).Milliseconds()
+
+		if err != nil {
+			writeJSON(w, DiscordTestResponse{
+				Success:   false,
+				LatencyMs: latency,
+				Message:   "Webhook 发送失败",
+				Error:     err.Error(),
+			})
+			return
+		}
+
+		writeJSON(w, DiscordTestResponse{
+			Success:   true,
+			LatencyMs: latency,
+			Message:   fmt.Sprintf("Webhook 测试消息发送成功 (延迟: %d ms)", latency),
+		})
 	})
 
 	// Admins (Instance-Aware)

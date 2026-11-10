@@ -318,6 +318,7 @@ class ApiService {
     bool proxySDR = true,
     bool proxySteamCmd = true,
     bool proxyMods = true,
+    bool proxyDiscord = true,
     required String proxyType,
     required String proxyAddress,
     required String clashApiUrl,
@@ -333,12 +334,30 @@ class ApiService {
         'proxySDR': proxySDR,
         'proxySteamCmd': proxySteamCmd,
         'proxyMods': proxyMods,
+        'proxyDiscord': proxyDiscord,
         'proxyType': proxyType,
         'proxyAddress': proxyAddress,
         'clashApiUrl': clashApiUrl,
         'clashSecret': clashSecret,
         'clashNode': clashNode,
         'clashGroup': clashGroup,
+      }),
+    );
+    return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> testDiscordWebhook({
+    required String webhookUrl,
+    String botName = '',
+    String avatarUrl = '',
+  }) async {
+    final res = await http.post(
+      _buildUri('/api/discord/test'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'webhookUrl': webhookUrl,
+        'botName': botName,
+        'avatarUrl': avatarUrl,
       }),
     );
     return jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;

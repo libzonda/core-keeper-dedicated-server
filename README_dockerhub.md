@@ -35,6 +35,7 @@ An all-in-one, production-ready Docker image for **Core Keeper Dedicated Server*
   - **Steam Workshop**: Paste any Workshop URL or Item ID to install directly—**no configuration required**.
   - **Mod.io Platform**: Built-in Mod.io REST API integration with global API key configuration, supporting mod search, installation via links/slugs, and one-click auto-updates across all instances.
   - **Local Upload**: Upload local `.zip` mod packages with automatic manifest parsing and deployment.
+- 🔔 **Discord Webhook Notifications**: Built-in Discord Webhook integration per instance. Real-time notifications for server online/offline, crashes (with error log excerpt), and player join/leave events. Fully customizable embed colors, titles, and message templates with one-click test notification and optional proxy routing support.
 
 ---
 

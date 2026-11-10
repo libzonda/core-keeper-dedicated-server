@@ -26,15 +26,79 @@ type ServerConfig struct {
 	WebPort       int    `json:"webPort"`       // Web manager port (default 8080)
 	ProxyEnabled  bool   `json:"proxyEnabled"`  // Master switch
 	ProxySDR      bool   `json:"proxySDR"`      // Enable proxy for Core Keeper server SDR
-	ProxySteamCmd bool   `json:"proxySteamCmd"` // Enable proxy for SteamCMD server updates
-	ProxyMods     bool   `json:"proxyMods"`     // Enable proxy for MOD downloads
-	ProxyType     string `json:"proxyType"`     // "http", "socks5", "clash"
-	ProxyAddress string `json:"proxyAddress"` // HTTP/SOCKS5 address (e.g. "http://127.0.0.1:7890" or "socks5://127.0.0.1:7890")
-	ClashApiUrl  string `json:"clashApiUrl"`  // Clash API URL (e.g. "http://127.0.0.1:9090")
-	ClashSecret  string `json:"clashSecret"`  // Clash API Bearer secret
-	ClashNode    string `json:"clashNode"`    // Selected Clash proxy node
-	ClashGroup   string `json:"clashGroup"`   // Selected Clash proxy group
-	ModioApiKey  string `json:"modioApiKey"`  // Mod.io API Key (shared across instances)
+	ProxySteamCmd bool          `json:"proxySteamCmd"` // Enable proxy for SteamCMD server updates
+	ProxyMods     bool          `json:"proxyMods"`     // Enable proxy for MOD downloads
+	ProxyDiscord  bool          `json:"proxyDiscord"`  // Enable proxy for Discord Webhook notifications
+	ProxyType     string        `json:"proxyType"`     // "http", "socks5", "clash"
+	ProxyAddress  string        `json:"proxyAddress"`  // HTTP/SOCKS5 address (e.g. "http://127.0.0.1:7890" or "socks5://127.0.0.1:7890")
+	ClashApiUrl   string        `json:"clashApiUrl"`   // Clash API URL (e.g. "http://127.0.0.1:9090")
+	ClashSecret   string        `json:"clashSecret"`   // Clash API Bearer secret
+	ClashNode     string        `json:"clashNode"`     // Selected Clash proxy node
+	ClashGroup    string        `json:"clashGroup"`    // Selected Clash proxy group
+	ModioApiKey   string        `json:"modioApiKey"`   // Mod.io API Key (shared across instances)
+	Discord       DiscordConfig `json:"discord"`       // Discord Webhook configuration
+}
+
+// DiscordMessageTemplate holds customizable title, description, color, and enabled state
+type DiscordMessageTemplate struct {
+	Enabled     bool   `json:"enabled"`
+	Color       string `json:"color"`       // Hex color string, e.g. "#2ECC71"
+	Title       string `json:"title"`       // Title template
+	Description string `json:"description"` // Description template with placeholders
+}
+
+// DiscordConfig holds Discord Webhook settings
+type DiscordConfig struct {
+	Enabled    bool                              `json:"enabled"`
+	WebhookURL string                            `json:"webhookUrl"`
+	BotName    string                            `json:"botName"`
+	AvatarURL  string                            `json:"avatarUrl"`
+	Messages   map[string]DiscordMessageTemplate `json:"messages"`
+}
+
+func DefaultDiscordMessages() map[string]DiscordMessageTemplate {
+	return map[string]DiscordMessageTemplate{
+		"server_online": {
+			Enabled:     true,
+			Color:       "#2ECC71",
+			Title:       "🟢 {server_name} Server is Ready",
+			Description: "Core Keeper Dedicated Server is running and ready for players to join!\n• **Game ID**: `{game_id}`\n• **Network Mode**: {network_mode}\n• **World**: {world_name} (Slot {world_index})\n• **Max Players**: {max_players}",
+		},
+		"server_offline": {
+			Enabled:     true,
+			Color:       "#95A5A6",
+			Title:       "⚪ {server_name} Server Stopped",
+			Description: "The server has shut down gracefully.\n• **Uptime**: {uptime}",
+		},
+		"server_crashed": {
+			Enabled:     true,
+			Color:       "#E74C3C",
+			Title:       "🔴 {server_name} Server Crashed",
+			Description: "⚠️ Dedicated server process exited unexpectedly!\n• **Exit Code**: {exit_code}\n• **Error Log Summary**:\n```\n{error_log}\n```",
+		},
+		"player_join": {
+			Enabled:     true,
+			Color:       "#3498DB",
+			Title:       "🎮 Player Joined the Underground World",
+			Description: "Player **{player_name}** has joined the server.",
+		},
+		"player_leave": {
+			Enabled:     true,
+			Color:       "#9B59B6",
+			Title:       "👋 Player Left the Underground World",
+			Description: "Player **{player_name}** has left the server.",
+		},
+	}
+}
+
+func DefaultDiscordConfig() DiscordConfig {
+	return DiscordConfig{
+		Enabled:    false,
+		WebhookURL: "",
+		BotName:    "Core Keeper Bot",
+		AvatarURL:  "https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/logo.png",
+		Messages:   DefaultDiscordMessages(),
+	}
 }
 
 // OfficialServerConfig represents the format in ServerConfig.json used by the game engine
@@ -74,6 +138,7 @@ func NewConfigManager(dataPath, serverPath string, webPort int) *ConfigManager {
 		ProxySDR:      getEnvBool("PROXY_SDR", true),
 		ProxySteamCmd: getEnvBool("PROXY_STEAMCMD", true),
 		ProxyMods:     getEnvBool("PROXY_MODS", true),
+		ProxyDiscord:  getEnvBool("PROXY_DISCORD", true),
 		ProxyType:     getEnv("PROXY_TYPE", "http"),
 		ProxyAddress:  getEnv("PROXY_ADDRESS", ""),
 		ClashApiUrl:   getEnv("CLASH_API_URL", "http://127.0.0.1:9090"),
@@ -81,6 +146,7 @@ func NewConfigManager(dataPath, serverPath string, webPort int) *ConfigManager {
 		ClashNode:     getEnv("CLASH_NODE", ""),
 		ClashGroup:    getEnv("CLASH_GROUP", ""),
 		ModioApiKey:   getEnv("MODIO_API_KEY", ""),
+		Discord:       DefaultDiscordConfig(),
 	}
 
 	cm := &ConfigManager{
@@ -124,6 +190,7 @@ func (cm *ConfigManager) Update(newCfg ServerConfig) error {
 	cm.config.ProxySDR = newCfg.ProxySDR
 	cm.config.ProxySteamCmd = newCfg.ProxySteamCmd
 	cm.config.ProxyMods = newCfg.ProxyMods
+	cm.config.ProxyDiscord = newCfg.ProxyDiscord
 	cm.config.ProxyType = newCfg.ProxyType
 	cm.config.ProxyAddress = newCfg.ProxyAddress
 	cm.config.ClashApiUrl = newCfg.ClashApiUrl
@@ -131,6 +198,7 @@ func (cm *ConfigManager) Update(newCfg ServerConfig) error {
 	cm.config.ClashNode = newCfg.ClashNode
 	cm.config.ClashGroup = newCfg.ClashGroup
 	cm.config.ModioApiKey = newCfg.ModioApiKey
+	cm.config.Discord = newCfg.Discord
 
 	if err := cm.saveUnlocked(); err != nil {
 		return err
@@ -139,7 +207,7 @@ func (cm *ConfigManager) Update(newCfg ServerConfig) error {
 	return cm.syncOfficialConfigUnlocked()
 }
 
-func (cm *ConfigManager) UpdateProxy(enabled, sdr, steamcmd, mods bool, pType, addr, clashUrl, clashSecret, clashNode, clashGroup string) error {
+func (cm *ConfigManager) UpdateProxy(enabled, sdr, steamcmd, mods, discord bool, pType, addr, clashUrl, clashSecret, clashNode, clashGroup string) error {
 	cm.mu.Lock()
 	defer cm.mu.Unlock()
 
@@ -147,6 +215,7 @@ func (cm *ConfigManager) UpdateProxy(enabled, sdr, steamcmd, mods bool, pType, a
 	cm.config.ProxySDR = sdr
 	cm.config.ProxySteamCmd = steamcmd
 	cm.config.ProxyMods = mods
+	cm.config.ProxyDiscord = discord
 	if pType != "" {
 		cm.config.ProxyType = pType
 	}
@@ -222,6 +291,11 @@ func (cm *ConfigManager) load() {
 		} else {
 			cm.config.ProxyMods = true
 		}
+		if _, ok := rawMap["proxyDiscord"]; ok {
+			cm.config.ProxyDiscord = loaded.ProxyDiscord
+		} else {
+			cm.config.ProxyDiscord = true
+		}
 
 		if loaded.ProxyType != "" {
 			cm.config.ProxyType = loaded.ProxyType
@@ -234,6 +308,24 @@ func (cm *ConfigManager) load() {
 		cm.config.ClashNode = loaded.ClashNode
 		cm.config.ClashGroup = loaded.ClashGroup
 		cm.config.ModioApiKey = loaded.ModioApiKey
+
+		if loaded.Discord.Messages == nil {
+			loaded.Discord.Messages = DefaultDiscordMessages()
+		} else {
+			defaults := DefaultDiscordMessages()
+			for k, v := range defaults {
+				if _, exists := loaded.Discord.Messages[k]; !exists {
+					loaded.Discord.Messages[k] = v
+				}
+			}
+		}
+		if loaded.Discord.BotName == "" {
+			loaded.Discord.BotName = "Core Keeper Bot"
+		}
+		if loaded.Discord.AvatarURL == "" {
+			loaded.Discord.AvatarURL = "https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/logo.png"
+		}
+		cm.config.Discord = loaded.Discord
 	}
 }
 
