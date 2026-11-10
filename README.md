@@ -15,6 +15,10 @@ English | [简体中文](README_zh-CN.md)
 
 An all-in-one, production-ready Docker image for **Core Keeper Dedicated Server**, featuring **Multi-Instance Support**, **Steam SDR relay (no port forwarding required)**, **Direct Connect**, and a modern **Flutter Web management dashboard**.
 
+<br />
+
+[![Dashboard Overview](./screenshots/01_overview.png)](./screenshots/01_overview.png)
+
 </div>
 
 ---
@@ -33,6 +37,26 @@ An all-in-one, production-ready Docker image for **Core Keeper Dedicated Server*
   - **Steam Workshop**: Paste any Workshop URL or Item ID to install directly—**no configuration required**.
   - **Mod.io Platform**: Built-in Mod.io REST API integration with global API key configuration, supporting mod search, installation via links/slugs, and one-click auto-updates across all instances.
   - **Local Upload**: Upload local `.zip` mod packages with automatic manifest parsing and deployment.
+
+---
+
+## 📸 Screenshots
+
+| 🖥️ Server Dashboard & Overview | 🏢 Multi-Instance Management |
+| :---: | :---: |
+| [![Server Dashboard](./screenshots/01_overview.png)](./screenshots/01_overview.png) | [![Multi-Instance Management](./screenshots/02_instances.png)](./screenshots/02_instances.png) |
+
+| 📜 Live Logs & WebSocket Console | ⚙️ Server Configuration & Proxy Settings |
+| :---: | :---: |
+| [![Live Logs & Console](./screenshots/03_log_track.png)](./screenshots/03_log_track.png) | [![Server Configuration](./screenshots/04_server_config.png)](./screenshots/04_server_config.png) |
+
+| 👑 In-Game Admin Management | 🌍 World Save Management & Backup |
+| :---: | :---: |
+| [![In-Game Admins](./screenshots/05_admins.png)](./screenshots/05_admins.png) | [![World Save Management](./screenshots/06_worlds.png)](./screenshots/06_worlds.png) |
+
+| 🧩 Integrated Mod Manager (Steam Workshop & Mod.io) |
+| :---: |
+| [![Integrated Mod Manager](./screenshots/07_mod_manager.png)](./screenshots/07_mod_manager.png) |
 
 ---
 

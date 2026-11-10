@@ -16,6 +16,10 @@
 专为 **地心护核者 (Core Keeper)** 打造的高性能全功能 Docker 部署镜像。<br/>
 原生集成 **多实例并发管理**、**Steam SDR 免公网穿透中继**、**直链联机** 以及基于 **Flutter Web** 的现代管理控制台。
 
+<br />
+
+[![控制台仪表盘](./screenshots/01_overview.png)](./screenshots/01_overview.png)
+
 </div>
 
 ---
@@ -34,6 +38,26 @@
   - **Steam 创意工坊**：直接粘贴工坊链接或工坊 ID 即可自动下载安装，**无需任何配置**。
   - **Mod.io 平台集成**：内置 Mod.io REST API 支持，在模组页配置全局 API Key 后，全实例均可直接解析链接/Slug 下载并支持全实例同步在线升级。
   - **本地上传**：支持直接上传本地 `.zip` 模组压缩包自动解压并补全清单部署。
+
+---
+
+## 📸 界面预览 (Screenshots)
+
+| 🖥️ 仪表盘总览 (Dashboard) | 🏢 多实例并发管理 (Instances) |
+| :---: | :---: |
+| [![仪表盘总览](./screenshots/01_overview.png)](./screenshots/01_overview.png) | [![多实例并发管理](./screenshots/02_instances.png)](./screenshots/02_instances.png) |
+
+| 📜 实时日志流与控制台 (Logs & Console) | ⚙️ 实例配置与网络代理 (Config & Proxy) |
+| :---: | :---: |
+| [![实时日志流](./screenshots/03_log_track.png)](./screenshots/03_log_track.png) | [![实例配置与网络代理](./screenshots/04_server_config.png)](./screenshots/04_server_config.png) |
+
+| 👑 游戏管理员维护 (Admins) | 🌍 世界存档管理与备份 (Worlds) |
+| :---: | :---: |
+| [![管理员维护](./screenshots/05_admins.png)](./screenshots/05_admins.png) | [![世界存档管理与备份](./screenshots/06_worlds.png)](./screenshots/06_worlds.png) |
+
+| 🧩 模组全能管理 (Steam 工坊 & Mod.io) |
+| :---: |
+| [![模组全能管理](./screenshots/07_mod_manager.png)](./screenshots/07_mod_manager.png) |
 
 ---
 
