@@ -56,9 +56,9 @@ An all-in-one, production-ready Docker image for **Core Keeper Dedicated Server*
 | :---: | :---: |
 | [![In-Game Admins](./screenshots/05_admins.png)](./screenshots/05_admins.png) | [![World Save Management](./screenshots/06_worlds.png)](./screenshots/06_worlds.png) |
 
-| 🧩 Integrated Mod Manager (Steam Workshop & Mod.io) |
-| :---: |
-| [![Integrated Mod Manager](./screenshots/07_mod_manager.png)](./screenshots/07_mod_manager.png) |
+| 🧩 Integrated Mod Manager (Steam Workshop & Mod.io) | 🔔 Discord Webhook Notifications |
+| :---: | :---: |
+| [![Integrated Mod Manager](./screenshots/07_mod_manager.png)](./screenshots/07_mod_manager.png) | [![Discord Webhook Notifications](./screenshots/08_discord.png)](./screenshots/08_discord.png) |
 
 ---
 

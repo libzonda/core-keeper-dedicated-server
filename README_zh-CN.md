@@ -57,9 +57,9 @@
 | :---: | :---: |
 | [![管理员维护](./screenshots/05_admins.png)](./screenshots/05_admins.png) | [![世界存档管理与备份](./screenshots/06_worlds.png)](./screenshots/06_worlds.png) |
 
-| 🧩 模组全能管理 (Steam 工坊 & Mod.io) |
-| :---: |
-| [![模组全能管理](./screenshots/07_mod_manager.png)](./screenshots/07_mod_manager.png) |
+| 🧩 模组全能管理 (Steam 工坊 & Mod.io) | 🔔 Discord Webhook 消息通知 |
+| :---: | :---: |
+| [![模组全能管理](./screenshots/07_mod_manager.png)](./screenshots/07_mod_manager.png) | [![Discord Webhook 消息通知](./screenshots/08_discord.png)](./screenshots/08_discord.png) |
 
 ---
 

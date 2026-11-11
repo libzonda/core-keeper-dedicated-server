@@ -53,9 +53,9 @@ An all-in-one, production-ready Docker image for **Core Keeper Dedicated Server*
 | :---: | :---: |
 | [![In-Game Admins](https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/screenshots/05_admins.png)](https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/screenshots/05_admins.png) | [![World Save Management](https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/screenshots/06_worlds.png)](https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/screenshots/06_worlds.png) |
 
-| 🧩 Integrated Mod Manager (Steam Workshop & Mod.io) |
-| :---: |
-| [![Integrated Mod Manager](https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/screenshots/07_mod_manager.png)](https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/screenshots/07_mod_manager.png) |
+| 🧩 Integrated Mod Manager (Steam Workshop & Mod.io) | 🔔 Discord Webhook Notifications |
+| :---: | :---: |
+| [![Integrated Mod Manager](https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/screenshots/07_mod_manager.png)](https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/screenshots/07_mod_manager.png) | [![Discord Webhook Notifications](https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/screenshots/08_discord.png)](https://raw.githubusercontent.com/libzonda/core-keeper-dedicated-server/main/screenshots/08_discord.png) |
 
 ---
 
