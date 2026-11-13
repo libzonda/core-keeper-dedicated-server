@@ -172,7 +172,7 @@ jobs:
         run: |
           cd web
           flutter pub get
-          flutter build macos --release --no-codesign
+          flutter build macos --release
 
       - name: Package macOS Release Bundle
         run: |
