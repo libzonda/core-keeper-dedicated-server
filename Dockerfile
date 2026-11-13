@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG APP_VERSION=v0.2.0
+ARG APP_VERSION=v0.2.1
 
 # -------------------------------------------------------------
 # Stage 1: Build Flutter Web Frontend

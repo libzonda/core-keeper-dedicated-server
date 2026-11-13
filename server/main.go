@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"syscall"
@@ -21,7 +22,7 @@ import (
 )
 
 // Version is injected during compilation via -ldflags="-X main.Version=vX.Y.Z"
-var Version = "v0.2.0"
+var Version = "v0.2.1"
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -30,9 +31,18 @@ var upgrader = websocket.Upgrader{
 }
 
 func main() {
-	serverDir := flag.String("server-dir", getEnv("GAME_PATH", "/server/game"), "Path to Core Keeper game files")
-	dataDir := flag.String("data-dir", getEnv("DATA_PATH", "/server/data"), "Path to server save and data files")
-	webDir := flag.String("web-dir", getEnv("WEB_DIR", "/server/web"), "Path to Flutter Web frontend files")
+	defaultServerDir := "/server/game"
+	defaultDataDir := "/server/data"
+	defaultWebDir := "/server/web"
+	if runtime.GOOS == "windows" {
+		defaultServerDir = "./game"
+		defaultDataDir = "./data"
+		defaultWebDir = "./web"
+	}
+
+	serverDir := flag.String("server-dir", getEnv("GAME_PATH", defaultServerDir), "Path to Core Keeper game files")
+	dataDir := flag.String("data-dir", getEnv("DATA_PATH", defaultDataDir), "Path to server save and data files")
+	webDir := flag.String("web-dir", getEnv("WEB_DIR", defaultWebDir), "Path to Flutter Web frontend files")
 	webPort := flag.Int("port", getEnvInt("WEB_PORT", 8080), "Web manager listening port")
 	flag.Parse()
 

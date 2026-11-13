@@ -28,6 +28,7 @@ import 'services/restart_state_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ApiService.instance.initDesktopSettings();
   await ThemeController.instance.init();
   await LocaleController.instance.init();
   unawaited(ApiService.instance.fetchVersion());

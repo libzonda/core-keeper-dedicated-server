@@ -1,0 +1,75 @@
+name: Build Windows Desktop
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'v*'
+      - '[0-9]+.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: server/go.sum
+
+      - name: Build Go Server Daemon (Windows amd64)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path build
+          cd server
+          $version = if ($env:GITHUB_REF_NAME) { $env:GITHUB_REF_NAME } else { "v0.2.1" }
+          go build -ldflags "-s -w -X main.Version=$version" -o ../build/corekeeper-manager.exe .
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Windows Desktop in Flutter
+        run: |
+          flutter config --enable-windows-desktop
+
+      - name: Build Flutter Windows Desktop
+        shell: pwsh
+        run: |
+          cd web
+          flutter pub get
+          flutter build windows --release
+
+      - name: Package Windows Release Bundle
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist
+          # Copy Flutter Release output (CoreKeeperManager.exe, flutter_windows.dll, data/, etc.)
+          Copy-Item -Recurse web\build\windows\x64\runner\Release\* dist\
+          # Copy Go server daemon executable
+          Copy-Item build\corekeeper-manager.exe dist\
+          # Copy Windows quick-launch helper script
+          Copy-Item scripts\start-windows.bat dist\
+          # Compress to zip archive
+          Compress-Archive -Path dist\* -DestinationPath CoreKeeperManager-Windows-x64.zip -Force
+
+      - name: Upload Windows Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoreKeeperManager-Windows-x64
+          path: CoreKeeperManager-Windows-x64.zip
+
+      - name: Attach Release Asset
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: CoreKeeperManager-Windows-x64.zip

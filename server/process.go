@@ -10,10 +10,10 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -230,17 +230,12 @@ func (pm *ProcessManager) Stop() error {
 		_ = updateCmd.Process.Kill()
 	}
 
-	pm.BroadcastLog("[Manager] Initiating graceful server shutdown (SIGINT)...")
+	pm.BroadcastLog("[Manager] Initiating graceful server shutdown...")
 
 	if cmd != nil && cmd.Process != nil {
-		pgid, err := syscall.Getpgid(cmd.Process.Pid)
-		if err == nil {
-			_ = syscall.Kill(-pgid, syscall.SIGINT)
-		} else {
-			_ = cmd.Process.Signal(syscall.SIGINT)
-		}
+		interruptProcess(cmd)
 
-		// Wait up to 10 seconds, then SIGKILL if still running
+		// Wait up to 10 seconds, then kill if still running
 		done := make(chan struct{})
 		go func() {
 			for i := 0; i < 20; i++ {
@@ -259,12 +254,8 @@ func (pm *ProcessManager) Stop() error {
 		select {
 		case <-done:
 		case <-time.After(10 * time.Second):
-			pm.BroadcastLog("[Manager] Force killing server process (SIGKILL)...")
-			if err == nil {
-				_ = syscall.Kill(-pgid, syscall.SIGKILL)
-			} else {
-				_ = cmd.Process.Kill()
-			}
+			pm.BroadcastLog("[Manager] Force killing server process...")
+			killProcess(cmd)
 		}
 	}
 
@@ -423,6 +414,9 @@ func (pm *ProcessManager) runServer() {
 
 	// Locate executable
 	execName := "CoreKeeperServer"
+	if runtime.GOOS == "windows" {
+		execName = "CoreKeeperServer.exe"
+	}
 	masterExecPath := filepath.Join(cfg.ServerDir, execName)
 
 	hasBinary := fileExists(masterExecPath)
@@ -609,9 +603,11 @@ func (pm *ProcessManager) runServer() {
 		}
 	}
 
-	// Unity games on headless Linux require Xvfb
+	// Unity games on headless Linux require Xvfb; Windows runs directly
 	var cmd *exec.Cmd
-	if os.Getenv("DISPLAY") != "" {
+	if runtime.GOOS == "windows" {
+		cmd = exec.Command(execPath, args...)
+	} else if os.Getenv("DISPLAY") != "" {
 		cmd = exec.Command(execPath, args...)
 	} else {
 		// Use xvfb-run
@@ -620,7 +616,7 @@ func (pm *ProcessManager) runServer() {
 	}
 
 	cmd.Dir = runDir
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	setProcessGroup(cmd)
 
 	// Construct clean environment with correct HOME and LD_LIBRARY_PATH
 	home := os.Getenv("HOME")
@@ -899,6 +895,27 @@ func scanLinesOrCR(data []byte, atEOF bool) (advance int, token []byte, err erro
 }
 
 func findSteamCmd() string {
+	if runtime.GOOS == "windows" {
+		if _, err := exec.LookPath("steamcmd.exe"); err == nil {
+			return "steamcmd.exe"
+		}
+		if _, err := exec.LookPath("steamcmd"); err == nil {
+			return "steamcmd"
+		}
+		winPaths := []string{
+			"steamcmd.exe",
+			".\\steamcmd\\steamcmd.exe",
+			"C:\\steamcmd\\steamcmd.exe",
+			"C:\\Program Files (x86)\\Steam\\steamcmd.exe",
+		}
+		for _, p := range winPaths {
+			if _, err := os.Stat(p); err == nil {
+				return p
+			}
+		}
+		return "steamcmd.exe"
+	}
+
 	if _, err := exec.LookPath("steamcmd"); err == nil {
 		return "steamcmd"
 	}

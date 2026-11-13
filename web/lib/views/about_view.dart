@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
+import '../services/api_service.dart';
 import '../theme/app_tokens.dart';
 import '../theme/app_typography.dart';
 import '../widgets/common_card.dart';
@@ -247,6 +249,119 @@ class AboutView extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+
+          if (!kIsWeb) ...[
+            const SizedBox(height: 20),
+            const _DesktopServerCard(),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DesktopServerCard extends StatefulWidget {
+  const _DesktopServerCard();
+
+  @override
+  State<_DesktopServerCard> createState() => _DesktopServerCardState();
+}
+
+class _DesktopServerCardState extends State<_DesktopServerCard> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: ApiService.instance.baseUrl);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    final text = _controller.text.trim();
+    if (text.isNotEmpty) {
+      await ApiService.instance.setDesktopBaseUrl(text);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Server endpoint updated! Reconnecting...')),
+        );
+      }
+      await ApiService.instance.fetchVersion();
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return CommonCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              IconWell(
+                icon: const Icon(Icons.desktop_windows_rounded, size: 20),
+                backgroundColor: SurfaceLevel.inset.colorOf(context),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Desktop Connection Settings',
+                      style: AppTextStyle.headline.of(context, emphasized: true),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Configure the backend daemon address (Default: http://127.0.0.1:8080)',
+                      style: AppTextStyle.caption1.of(
+                        context,
+                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _controller,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.link_rounded, size: 18),
+                    hintText: 'http://127.0.0.1:8080',
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              SquircleButton(
+                variant: ButtonVariant.primary,
+                icon: const Icon(Icons.save_rounded, size: 16),
+                onPressed: _save,
+                child: const Text('Save'),
+              ),
+            ],
           ),
         ],
       ),

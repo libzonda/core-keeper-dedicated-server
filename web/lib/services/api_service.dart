@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../models/server_status.dart';
 import '../models/server_config.dart';
@@ -24,11 +25,36 @@ class ApiService {
     tabNavigationNotifier.value = index;
   }
 
+  String _desktopBaseUrl = 'http://127.0.0.1:8080';
+
+  Future<void> initDesktopSettings() async {
+    if (!kIsWeb) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        final saved = prefs.getString('desktop_server_url');
+        if (saved != null && saved.trim().isNotEmpty) {
+          _desktopBaseUrl = saved.trim().replaceAll(RegExp(r'/+$'), '');
+        }
+      } catch (_) {}
+    }
+  }
+
+  Future<void> setDesktopBaseUrl(String url) async {
+    final clean = url.trim().replaceAll(RegExp(r'/+$'), '');
+    _desktopBaseUrl = clean.isNotEmpty ? clean : 'http://127.0.0.1:8080';
+    if (!kIsWeb) {
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('desktop_server_url', _desktopBaseUrl);
+      } catch (_) {}
+    }
+  }
+
   String get baseUrl {
     if (kIsWeb) {
       return '';
     }
-    return 'http://localhost:8080';
+    return _desktopBaseUrl;
   }
 
   String get wsUrl {
@@ -37,7 +63,11 @@ class ApiService {
       final scheme = loc.scheme == 'https' ? 'wss' : 'ws';
       return '$scheme://${loc.host}:${loc.port}/api/ws/logs';
     }
-    return 'ws://localhost:8080/api/ws/logs';
+    final parsed = Uri.tryParse(_desktopBaseUrl);
+    final scheme = parsed?.scheme == 'https' ? 'wss' : 'ws';
+    final host = (parsed?.host.isNotEmpty == true) ? parsed!.host : '127.0.0.1';
+    final port = (parsed != null && parsed.hasPort) ? ':${parsed.port}' : (parsed?.scheme == 'https' ? '' : ':8080');
+    return '$scheme://$host$port/api/ws/logs';
   }
 
   Uri _buildUri(String path, [Map<String, dynamic>? queryParams]) {
