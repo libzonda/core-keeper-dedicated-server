@@ -1,0 +1,199 @@
+name: Build Desktop Clients (Windows, Linux, macOS)
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'v*'
+      - '[0-9]+.*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows Desktop (x64)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: server/go.sum
+
+      - name: Build Go Server Daemon (Windows amd64)
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path build
+          cd server
+          $version = if ($env:GITHUB_REF_NAME) { $env:GITHUB_REF_NAME } else { "v0.2.2" }
+          go build -ldflags "-s -w -X main.Version=$version" -o ../build/corekeeper-manager.exe .
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Windows Desktop in Flutter
+        run: |
+          flutter config --enable-windows-desktop
+
+      - name: Build Flutter Windows Desktop
+        shell: pwsh
+        run: |
+          cd web
+          flutter pub get
+          flutter build windows --release
+
+      - name: Package Windows Release Bundle
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist
+          Copy-Item -Recurse web\build\windows\x64\runner\Release\* dist\
+          Copy-Item build\corekeeper-manager.exe dist\
+          Copy-Item scripts\start-windows.bat dist\
+          Compress-Archive -Path dist\* -DestinationPath CoreKeeperManager-Windows-x64.zip -Force
+
+      - name: Upload Windows Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoreKeeperManager-Windows-x64
+          path: CoreKeeperManager-Windows-x64.zip
+
+      - name: Attach Release Asset
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: CoreKeeperManager-Windows-x64.zip
+
+  build-linux:
+    name: Build Linux Desktop (x64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: server/go.sum
+
+      - name: Build Go Server Daemon (Linux amd64)
+        run: |
+          mkdir -p build
+          cd server
+          VERSION="${GITHUB_REF_NAME:-v0.2.2}"
+          go build -ldflags "-s -w -X main.Version=$VERSION" -o ../build/corekeeper-manager .
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Linux Desktop in Flutter
+        run: |
+          flutter config --enable-linux-desktop
+
+      - name: Build Flutter Linux Desktop
+        run: |
+          cd web
+          flutter pub get
+          flutter build linux --release
+
+      - name: Package Linux Release Bundle
+        run: |
+          mkdir -p dist
+          cp -r web/build/linux/x64/release/bundle/* dist/
+          cp build/corekeeper-manager dist/
+          cp scripts/start-linux.sh dist/
+          chmod +x dist/start-linux.sh dist/corekeeper-manager dist/CoreKeeperManager
+          tar -czvf CoreKeeperManager-Linux-x64.tar.gz -C dist .
+
+      - name: Upload Linux Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoreKeeperManager-Linux-x64
+          path: CoreKeeperManager-Linux-x64.tar.gz
+
+      - name: Attach Release Asset
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: CoreKeeperManager-Linux-x64.tar.gz
+
+  build-macos:
+    name: Build macOS Desktop (Universal)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: server/go.sum
+
+      - name: Build Go Server Daemon (macOS Universal Binary)
+        run: |
+          mkdir -p build
+          cd server
+          VERSION="${GITHUB_REF_NAME:-v0.2.2}"
+          GOOS=darwin GOARCH=arm64 go build -ldflags "-s -w -X main.Version=$VERSION" -o ../build/corekeeper-manager-arm64 .
+          GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w -X main.Version=$VERSION" -o ../build/corekeeper-manager-amd64 .
+          lipo -create -output ../build/corekeeper-manager ../build/corekeeper-manager-arm64 ../build/corekeeper-manager-amd64
+          rm ../build/corekeeper-manager-arm64 ../build/corekeeper-manager-amd64
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable macOS Desktop in Flutter
+        run: |
+          flutter config --enable-macos-desktop
+
+      - name: Build Flutter macOS Desktop
+        run: |
+          cd web
+          flutter pub get
+          flutter build macos --release --no-codesign
+
+      - name: Package macOS Release Bundle
+        run: |
+          mkdir -p dist
+          cp -R web/build/macos/Build/Products/Release/CoreKeeperManager.app dist/
+          cp build/corekeeper-manager dist/
+          cp scripts/start-macos.command dist/
+          chmod +x dist/start-macos.command dist/corekeeper-manager
+          cd dist
+          zip -r ../CoreKeeperManager-macOS-Universal.zip CoreKeeperManager.app corekeeper-manager start-macos.command
+          cd ..
+
+      - name: Upload macOS Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CoreKeeperManager-macOS-Universal
+          path: CoreKeeperManager-macOS-Universal.zip
+
+      - name: Attach Release Asset
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: CoreKeeperManager-macOS-Universal.zip
