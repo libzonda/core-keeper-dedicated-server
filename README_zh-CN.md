@@ -40,6 +40,7 @@
   - **Mod.io 平台集成**：内置 Mod.io REST API 支持，在模组页配置全局 API Key 后，全实例均可直接解析链接/Slug 下载并支持全实例同步在线升级。
   - **本地上传**：支持直接上传本地 `.zip` 模组压缩包自动解压并补全清单部署。
 - 🔔 **Discord Webhook 消息通知**：实例级内置 Discord Webhook 推送支持。实时推送服务端就绪、正常关服、异常崩溃（附带错误日志摘要）以及玩家加入/离开等事件。支持独立开关控制、Embed 卡片色彩与 Markdown 消息正文完全自定义，并提供一键测试与代理节点转发支持。
+- 💻 **全平台桌面客户端 (Windows / macOS / Linux)**：官方提供全平台原生桌面图形化客户端，前往 GitHub Releases 即可一键下载使用。既可远程连接控制 NAS/云服务器上的 Docker 专服，也能在本地桌面开箱即用。
 
 ---
 
@@ -106,6 +107,18 @@ docker compose up -d
 ### 3. 访问 Web 控制台
 
 在浏览器中打开 **`http://<服务器IP>:8080`** 即可进入后台管理各实例、查看日志与管理模组。
+
+---
+
+## 💻 原生桌面客户端下载 (Windows / macOS / Linux)
+
+不想使用 Docker？官方提供内置 Go 服务端守护进程与 Flutter 图形化界面的原生桌面程序，直接前往 GitHub Releases 即可下载：
+
+| 操作系统 | 软件包 | 支持架构 | 包含组件 |
+|---|---|---|---|
+| **Windows** | [`CoreKeeperManager-Windows-x64.zip`](https://github.com/libzonda/core-keeper-dedicated-server/releases/latest) | x64 (amd64) | Win32 原生客户端 + Go 守护程序 + `start-windows.bat` |
+| **Linux** | [`CoreKeeperManager-Linux-x64.tar.gz`](https://github.com/libzonda/core-keeper-dedicated-server/releases/latest) | x64 (amd64) | GTK 原生客户端 + Go 守护程序 + `start-linux.sh` |
+| **macOS** | [`CoreKeeperManager-macOS-Universal.zip`](https://github.com/libzonda/core-keeper-dedicated-server/releases/latest) | 通用二进制 (Apple M系列 & Intel) | `CoreKeeperManager.app` 应用包 + Universal Go 守护程序 + `start-macos.command` |
 
 ---
 

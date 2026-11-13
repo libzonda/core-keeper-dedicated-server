@@ -5,6 +5,7 @@
 # Core Keeper Dedicated Server & Web Manager
 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-libzonda%2Fcore--keeper--dedicated--server-blue?logo=github&style=flat-square)](https://github.com/libzonda/core-keeper-dedicated-server)
+[![GitHub Release](https://img.shields.io/github/v/release/libzonda/core-keeper-dedicated-server?style=flat-square&logo=github)](https://github.com/libzonda/core-keeper-dedicated-server/releases)
 [![Docker Pulls](https://img.shields.io/docker/pulls/libzonda/core-keeper-dedicated-server?style=flat-square&logo=docker)](https://hub.docker.com/r/libzonda/core-keeper-dedicated-server)
 ![Steam App ID](https://img.shields.io/badge/Steam%20AppID-1963720-orange?style=flat-square&logo=steam)
 ![Network Mode](https://img.shields.io/badge/Network%20Mode-Steam%20SDR%20%7C%20Direct-green?style=flat-square)
@@ -36,6 +37,7 @@ An all-in-one, production-ready Docker image for **Core Keeper Dedicated Server*
   - **Mod.io Platform**: Built-in Mod.io REST API integration with global API key configuration, supporting mod search, installation via links/slugs, and one-click auto-updates across all instances.
   - **Local Upload**: Upload local `.zip` mod packages with automatic manifest parsing and deployment.
 - 🔔 **Discord Webhook Notifications**: Built-in Discord Webhook integration per instance. Real-time notifications for server online/offline, crashes (with error log excerpt), and player join/leave events. Fully customizable embed colors, titles, and message templates with one-click test notification and optional proxy routing support.
+- 💻 **Cross-Platform Desktop Clients (Windows, Linux, macOS)**: Standalone desktop apps with built-in server daemon and Flutter GUI are available directly on GitHub Releases. Control remote servers or host locally on Windows/Linux/macOS with zero installation.
 
 ---
 
@@ -60,6 +62,8 @@ An all-in-one, production-ready Docker image for **Core Keeper Dedicated Server*
 ---
 
 ## 🚀 Quick Start (Docker Compose)
+
+### 1. docker-compose.yml
 
 Create a `docker-compose.yml` file in your project directory:
 
@@ -90,15 +94,45 @@ services:
 
 > **Tip:** You do not need to configure any game instance parameters in `docker-compose.yml`. All settings (World Name, Seed, Difficulty, Max Players, Network Mode, Game Port, Admins, and Mods) are created and managed visually in the Web Dashboard. If you exclusively use **Steam SDR mode**, you don't even need to expose any UDP port range.
 
-### Start the Server
+### 2. Start the Server
 
 ```bash
 docker compose up -d
 ```
 
-### Access Web Dashboard
+### 3. Access Web Dashboard
 
 Open **`http://<your-server-ip>:8080`** in your browser.
+
+---
+
+## 💻 Native Desktop Clients (Windows, Linux, macOS)
+
+Don't want to use Docker? Standalone desktop applications with an embedded server daemon and Flutter GUI are available directly on GitHub Releases:
+
+| Platform | Package | Architecture | Description |
+|---|---|---|---|
+| **Windows** | [`CoreKeeperManager-Windows-x64.zip`](https://github.com/libzonda/core-keeper-dedicated-server/releases/latest) | x64 (amd64) | Win32 desktop application + Go server daemon + `start-windows.bat` |
+| **Linux** | [`CoreKeeperManager-Linux-x64.tar.gz`](https://github.com/libzonda/core-keeper-dedicated-server/releases/latest) | x64 (amd64) | GTK desktop application + Go server daemon + `start-linux.sh` |
+| **macOS** | [`CoreKeeperManager-macOS-Universal.zip`](https://github.com/libzonda/core-keeper-dedicated-server/releases/latest) | Universal (Apple Silicon & Intel) | `CoreKeeperManager.app` bundle + Universal Go daemon + `start-macos.command` |
+
+---
+
+## 🏢 Multi-Instance Setup & Networking
+
+The system supports running multiple server instances concurrently:
+
+1. **Creating Instances**: Go to the **Instances** tab in the Web Dashboard and click **"New Instance"**.
+2. **Port Allocation**: When using Direct Connect mode, each instance must use a distinct port (recommended spacing of 10 ports, e.g., `27015`, `27025`, `27035`). Ensure the corresponding UDP port range is mapped in `docker-compose.yml`.
+3. **SDR Multi-Instance**: Under SDR mode, each instance automatically generates its own independent **Game ID**. No port conflicts exist in SDR mode.
+4. **Shared Mod Pool**: Mods are stored centrally in `server-data/shared_mods` and can be enabled/disabled per instance with a single click.
+
+---
+
+## 🎮 How Players Join
+
+- **Steam SDR (Default & Recommended)**: Copy the **Game ID** from the Web Dashboard. In the Core Keeper game client, choose **Join Game** and paste the Game ID. Works behind NAT/firewalls without port forwarding.
+- **Direct Connect**: Ensure UDP ports (e.g. `27015`) are open. Players join by entering `<Server-IP>:<Port>` and server password (if set).
 
 ---
 
@@ -109,17 +143,38 @@ Open **`http://<your-server-ip>:8080`** in your browser.
 | `./server-data` | `/server/data` | Stores all instance metadata, world save files (`.world.gzip`), admin configs, proxy settings, and shared mod pool. |
 | `./server-game` | `/server/game` | Core Keeper Dedicated Server binaries automatically downloaded and updated by SteamCMD. |
 
+```text
+.
+├── docker-compose.yml          # Container configuration
+├── logo.png                    # Brand logo
+├── server-data/                # Persistent user data (mounted to /server/data)
+│   ├── instances.json          # Server instances registry
+│   ├── manager_config.json     # Global web manager & proxy configuration
+│   ├── shared_mods/            # Shared mod repository pool
+│   └── instances/              # Isolated instance directories
+│       └── <instance_id>/      # Instance-specific runtime files
+│           ├── ServerConfig.json       # Game engine official config
+│           ├── manager_config.json     # Instance manager config
+│           ├── Admins.json             # Steam admin permissions
+│           ├── PlayerBans.json         # Banned players list
+│           ├── GameID.txt              # Generated Steam SDR Game ID
+│           ├── worlds/                 # World saves (.world.gzip)
+│           ├── mods/                   # Active mods symlinks for this instance
+│           └── backups/                # Save rollbacks & backups
+└── server-game/                # Core Keeper official binaries (mounted to /server/game)
+```
+
 ---
 
-## 🌐 Networking Modes
+## ⚙️ Container Environment Variables
 
-### 1. Steam SDR Mode (Default & Recommended)
-- **Zero port forwarding needed**: Works seamlessly behind NAT, CGNAT, or mobile networks.
-- Simply copy the **Game ID** generated on the Web Dashboard. Players join directly by entering the Game ID in the Core Keeper client.
+Since this manager natively supports multi-instance management, all instance configurations (worlds, difficulty, game ports, passwords, player limits, admins, and mods) as well as proxy and Mod.io configurations are managed visually inside the **Web Dashboard**.
 
-### 2. Direct Connect Mode (For Dedicated / Low-Latency Networks)
-- Requires exposing container UDP ports (e.g. `27015:27015/udp`).
-- Players join directly using `<Your-Server-IP>:<Port>` and password (if set).
+Only the container Web service port can be optionally overridden:
+
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| **`WEB_PORT`** | `8080` | Port for the Web management dashboard |
 
 ---
 
@@ -135,4 +190,3 @@ Open **`http://<your-server-ip>:8080`** in your browser.
 ## 📄 License
 
 This project is licensed under the [GNU Affero General Public License v3.0 (AGPL-3.0)](https://github.com/libzonda/core-keeper-dedicated-server/blob/main/LICENSE).
-

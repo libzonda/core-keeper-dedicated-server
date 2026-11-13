@@ -1,0 +1,31 @@
+name: Update Docker Hub Description
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'README_dockerhub.md'
+      - '.github/workflows/update-dockerhub-description.yml'
+  workflow_dispatch:
+
+jobs:
+  docker-hub-description:
+    runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update Docker Hub Description
+        if: env.DOCKERHUB_USERNAME != '' && env.DOCKERHUB_TOKEN != ''
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
+          repository: ${{ env.DOCKERHUB_REPO != '' && env.DOCKERHUB_REPO || 'libzonda/core-keeper-dedicated-server' }}
+          readme-filepath: ./README_dockerhub.md
+          short-description: "Core Keeper Dedicated Server with Web GUI, Multi-instance, Steam SDR & Direct Connect, Mod.io & Workshop."

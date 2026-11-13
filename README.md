@@ -39,6 +39,7 @@ An all-in-one, production-ready Docker image for **Core Keeper Dedicated Server*
   - **Mod.io Platform**: Built-in Mod.io REST API integration with global API key configuration, supporting mod search, installation via links/slugs, and one-click auto-updates across all instances.
   - **Local Upload**: Upload local `.zip` mod packages with automatic manifest parsing and deployment.
 - 🔔 **Discord Webhook Notifications**: Built-in Discord Webhook integration per instance. Real-time notifications for server online/offline, crashes (with error log excerpt), and player join/leave events. Fully customizable embed colors, titles, and message templates with one-click test notification and optional proxy routing support.
+- 💻 **Cross-Platform Desktop Clients (Windows, Linux, macOS)**: Standalone desktop apps with built-in server daemon and Flutter GUI are available directly on GitHub Releases. Control remote servers or host locally on Windows/Linux/macOS with zero installation.
 
 ---
 
@@ -106,6 +107,18 @@ docker compose up -d
 ### 3. Access Web Dashboard
 
 Open **`http://<your-server-ip>:8080`** in your browser to manage server instances, view live logs, install mods, and configure worlds.
+
+---
+
+## 💻 Native Desktop Clients (Windows, Linux, macOS)
+
+Don't want to use Docker? Standalone desktop applications with an embedded server daemon and Flutter GUI are available directly on GitHub Releases:
+
+| Platform | Package | Architecture | Description |
+|---|---|---|---|
+| **Windows** | [`CoreKeeperManager-Windows-x64.zip`](https://github.com/libzonda/core-keeper-dedicated-server/releases/latest) | x64 (amd64) | Win32 desktop application + Go server daemon + `start-windows.bat` |
+| **Linux** | [`CoreKeeperManager-Linux-x64.tar.gz`](https://github.com/libzonda/core-keeper-dedicated-server/releases/latest) | x64 (amd64) | GTK desktop application + Go server daemon + `start-linux.sh` |
+| **macOS** | [`CoreKeeperManager-macOS-Universal.zip`](https://github.com/libzonda/core-keeper-dedicated-server/releases/latest) | Universal (Apple Silicon & Intel) | `CoreKeeperManager.app` bundle + Universal Go daemon + `start-macos.command` |
 
 ---
 
